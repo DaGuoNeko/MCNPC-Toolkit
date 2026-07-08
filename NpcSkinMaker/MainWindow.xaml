@@ -91,7 +91,13 @@
 
                     <!-- 左侧导航栏 -->
                     <Border x:Name="PanMainLeft" Grid.Column="0" Background="#E6FFFFFF" BorderBrush="{DynamicResource ColorBrushGray5}" BorderThickness="0,0,1,0">
-                        <StackPanel x:Name="PanLeftItems" Margin="8,12,8,12" />
+                        <Grid>
+                            <!-- 滑动指示条 -->
+                            <Border x:Name="NavIndicator" Width="3" Background="{DynamicResource ColorBrush3}"
+                                    CornerRadius="1.5" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Margin="5,12,0,0" Height="28" />
+                            <StackPanel x:Name="PanLeftItems" Margin="8,12,8,12" />
+                        </Grid>
                     </Border>
 
                     <!-- 右侧内容区 -->

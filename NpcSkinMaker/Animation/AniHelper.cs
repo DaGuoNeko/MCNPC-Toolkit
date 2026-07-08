@@ -209,38 +209,31 @@ namespace NpcSkinMaker
         /// 每个元素从 Y=-20 下落，带回弹，错峰 80ms </summary>
         public static void PageEnterAnimation(FrameworkElement container, int baseDelay = 0)
         {
-            // 先确保容器可见
             container.Opacity = 1;
 
             if (ControlEnabled > 0)
                 return;
 
             int delay = baseDelay;
-            var children = GetTopLevelChildren(container);
-            bool hasChildren = false;
-            foreach (var child in children)
+            int count = 0;
+            foreach (var child in GetTopLevelChildren(container))
             {
                 var fe = child as FrameworkElement;
                 if (fe == null) continue;
-                hasChildren = true;
+                count++;
 
-                // 初始状态：上方 20px + 透明
                 var transform = EnsureTranslateTransform(fe);
                 transform.X = 0;
-                transform.Y = -20;
+                transform.Y = -40;
                 fe.Opacity = 0;
 
-                // 淡入 150ms
-                AniOpacity(fe, 1, 150, delay);
-                // Y 下落到 0，400ms，带回弹
-                AniTranslateY(fe, 0, 400, delay, easeBack: true);
+                AniOpacity(fe, 1, 200, delay);
+                AniTranslateY(fe, 0, 450, delay, easeBack: true);
 
-                // 按行错峰 80ms
-                delay += 80;
+                delay += 90;
             }
 
-            // 如果没有子元素，不动画，直接显示
-            if (!hasChildren)
+            if (count == 0)
                 container.Opacity = 1;
         }
 
@@ -660,41 +653,57 @@ namespace NpcSkinMaker
         /// 会跳过 ScrollViewer 取其内容，跳过透明/不可见元素 </summary>
         private static System.Collections.Generic.IEnumerable<DependencyObject> GetTopLevelChildren(DependencyObject container)
         {
-            // 如果是 ScrollViewer，取其内容
-            var scrollViewer = container as System.Windows.Controls.ScrollViewer;
-            if (scrollViewer != null)
+            // 所有页面统一用 PanContent 作为内容容器，直接找它的子元素
+            var panContent = FindChildByName(container, "PanContent");
+            if (panContent != null)
+                container = panContent;
+            else
             {
-                var content = scrollViewer.Content as DependencyObject;
-                if (content != null)
-                    container = content;
+                // 兜底：试试走 ScrollViewer -> Content 的路径
+                var sv = FindChildOfType<System.Windows.Controls.ScrollViewer>(container);
+                if (sv != null && sv.Content is DependencyObject)
+                    container = sv.Content as DependencyObject;
             }
 
-            // 如果是 Border，取其 Child
-            var border = container as System.Windows.Controls.Border;
-            if (border != null && border.Child != null)
-            {
-                container = border.Child;
-            }
-
-            // 如果是 ContentControl，取其 Content
-            var cc = container as System.Windows.Controls.ContentControl;
-            if (cc != null && cc.Content is DependencyObject)
-            {
-                container = cc.Content as DependencyObject;
-            }
-
-            // 现在 container 应该是 Panel（StackPanel/Grid/WrapPanel 等），遍历直接子元素
             var children = LogicalTreeHelper.GetChildren(container);
             foreach (var child in children)
             {
                 var fe = child as FrameworkElement;
                 if (fe == null) continue;
-
-                // 跳过不可见元素
                 if (fe.Visibility == Visibility.Collapsed) continue;
-
                 yield return fe;
             }
+        }
+
+        /// <summary>按名称递归查找子元素</summary>
+        private static FrameworkElement FindChildByName(DependencyObject parent, string name)
+        {
+            var fe = parent as FrameworkElement;
+            if (fe != null && fe.Name == name) return fe;
+
+            foreach (var child in LogicalTreeHelper.GetChildren(parent))
+            {
+                var dep = child as DependencyObject;
+                if (dep == null) continue;
+                var result = FindChildByName(dep, name);
+                if (result != null) return result;
+            }
+            return null;
+        }
+
+        /// <summary>按类型递归查找子元素</summary>
+        private static T FindChildOfType<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent is T) return (T)parent;
+
+            foreach (var child in LogicalTreeHelper.GetChildren(parent))
+            {
+                var dep = child as DependencyObject;
+                if (dep == null) continue;
+                var result = FindChildOfType<T>(dep);
+                if (result != null) return result;
+            }
+            return null;
         }
 
         #endregion

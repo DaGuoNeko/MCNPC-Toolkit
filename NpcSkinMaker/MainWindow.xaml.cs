@@ -229,8 +229,8 @@ namespace NpcSkinMaker
         private void InitializeNavigation()
         {
             AddNavButton("首页", MyIconButton.IconHome, 0);
-            AddNavButton("MC 工具箱", MyIconButton.IconCreeper, 1);
-            AddNavButton("3D 文字", MyIconButton.IconAdd, 2);
+            AddNavButton("3D 文字", MyIconButton.IconCreeper, 1);
+            AddNavButton("开发者工具箱", MyIconButton.IconSettings, 2);
             AddNavButton("设置", MyIconButton.IconSettings, 3);
             AddNavButton("关于", MyIconButton.IconInfo, 4);
         }
@@ -251,11 +251,25 @@ namespace NpcSkinMaker
 
         public void NavigateToPage(int index)
         {
-            if (index == _currentPageIndex || _isTransitioning) return;
-            _isTransitioning = true;
+            if (index == _currentPageIndex) return;
 
             foreach (var btn in _navButtons)
                 btn.IsSelected = btn.Index == index;
+
+            // 滑动指示条动画
+            if (index >= 0 && index < _navButtons.Count)
+            {
+                var targetBtn = _navButtons[index];
+                // 计算目标位置：按钮在 PanLeftItems 中的实际位置
+                targetBtn.UpdateLayout();
+                var transform = targetBtn.TransformToAncestor(PanMainLeft);
+                var pos = transform.Transform(new System.Windows.Point(0, 0));
+                double targetY = pos.Y;
+                double targetH = targetBtn.ActualHeight;
+
+                AniHelper.AniThickness(NavIndicator,
+                    new Thickness(5, targetY + (targetH - 28) / 2, 0, 0), 100, 0);
+            }
 
             FrameworkElement newPage = null;
             switch (index)
@@ -264,12 +278,12 @@ namespace NpcSkinMaker
                     newPage = _currentTool == 0 ? (FrameworkElement)new PageHome() : (FrameworkElement)new PageModelHome();
                     break;
                 case 1:
-                    if (_pageMcTools == null) _pageMcTools = new PageMcTools();
-                    newPage = _pageMcTools;
-                    break;
-                case 2:
                     if (_page3DText == null) _page3DText = new Page3DText();
                     newPage = _page3DText;
+                    break;
+                case 2:
+                    if (_pageMcTools == null) _pageMcTools = new PageMcTools();
+                    newPage = _pageMcTools;
                     break;
                 case 3: newPage = new PageSettings(); break;
                 case 4: newPage = new PageAbout(); break;
@@ -280,16 +294,18 @@ namespace NpcSkinMaker
                 PanRightContent.Children.Clear();
                 PanRightContent.Children.Add(newPage);
 
-                // 下一帧播入场动画
-                Dispatcher.BeginInvoke(new Action(() =>
+                // 页面加载完成后播入场动画
+                RoutedEventHandler onLoaded = null;
+                onLoaded = (s, e) =>
                 {
+                    newPage.Loaded -= onLoaded;
                     try { AniHelper.PageEnterAnimation(newPage); }
                     catch (Exception ex) { Logger.Error("页面动画异常: " + ex.Message); }
-                }), DispatcherPriority.Loaded);
+                };
+                newPage.Loaded += onLoaded;
             }
 
             _currentPageIndex = index;
-            _isTransitioning = false;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -337,6 +353,16 @@ namespace NpcSkinMaker
 
                 // 左侧导航栏滑出动画（仿 PCL MyPageLeft）
                 AniHelper.LeftPanelEnterAnimation(PanLeftItems.Children, baseDelay: 200);
+
+                // 首次定位指示条（无动画）
+                if (_navButtons.Count > 0)
+                {
+                    var btn = _navButtons[0];
+                    btn.UpdateLayout();
+                    var transform = btn.TransformToAncestor(PanMainLeft);
+                    var pos = transform.Transform(new System.Windows.Point(0, 0));
+                    NavIndicator.Margin = new Thickness(5, pos.Y + (btn.ActualHeight - 28) / 2, 0, 0);
+                }
             }), DispatcherPriority.Render);
         }
 

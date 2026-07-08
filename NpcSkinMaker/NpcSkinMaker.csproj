@@ -11,6 +11,7 @@
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
     <Deterministic>true</Deterministic>
     <Platforms>AnyCPU</Platforms>
+    <Prefer32Bit>false</Prefer32Bit>
     <!-- 不自动生成 AssemblyInfo，用现有的 Properties\AssemblyInfo.cs -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -46,19 +47,17 @@
     <Resource Include="Resources\icon.ico" />
   </ItemGroup>
 
-  <!-- WebView2Loader.dll（x64，确保被复制到输出目录） -->
+  <!-- WebView2 原生 DLL（强制 x64） -->
   <ItemGroup>
-    <None Include="$(NuGetPackageRoot)\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll"
-          CopyToOutputDirectory="PreserveNewest"
-          Link="WebView2Loader.dll" />
+    <Content Include="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="WebView2Loader.dll" />
   </ItemGroup>
 
-  <!-- Cube 3D Text 离线版（复制到输出目录） -->
-  <ItemGroup>
-    <Content Include="Resources\cube3d\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <LinkBase>Resources\cube3d\</LinkBase>
-    </Content>
-  </ItemGroup>
+  <!-- 构建后强制覆盖为 x64（防止 NuGet 自动复制 x86 版本） -->
+  <Target Name="ForceX64WebView2" AfterTargets="AfterBuild">
+    <Copy SourceFiles="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll"
+          DestinationFiles="$(OutputPath)WebView2Loader.dll" />
+  </Target>
 
 </Project>

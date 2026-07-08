@@ -104,51 +104,68 @@ namespace NpcSkinMaker
                 throw new Exception("无效的皮肤数据格式");
 
             var npcskinlist = data["npcskinlist"];
-            List<object> list = npcskinlist as List<object>;
-            if (list == null)
-                throw new Exception("皮肤列表格式无效");
-
-            if (list.Count > MaxSkins)
-                throw new Exception("皮肤数量超过限制（最多 " + MaxSkins + " 个）");
-
-            _skins.Clear();
-
-            foreach (var itemObj in list)
+            // Newtonsoft.Json 反序列化出来的是 JArray，不是 List<object>
+            var jArray = npcskinlist as Newtonsoft.Json.Linq.JArray;
+            if (jArray == null)
             {
-                Dictionary<string, object> item = itemObj as Dictionary<string, object>;
-                if (item == null)
-                    throw new Exception("皮肤数据格式无效");
+                var list = npcskinlist as System.Collections.IList;
+                if (list == null || list.Count == 0)
+                    throw new Exception("皮肤列表格式无效");
+                if (list.Count > MaxSkins)
+                    throw new Exception("皮肤数量超过限制（最多 " + MaxSkins + " 个）");
 
-                if (!item.ContainsKey("ID") || !item.ContainsKey("name") ||
-                    !item.ContainsKey("by") || !item.ContainsKey("texture"))
-                    throw new Exception("皮肤数据缺少必要字段");
-
-                string texturePath = item["texture"].ToString();
-                string textureFilename = texturePath.Contains("/")
-                    ? texturePath.Substring(texturePath.LastIndexOf('/') + 1)
-                    : texturePath;
-
-                // 移除可能存在的 .png 后缀
-                if (textureFilename.EndsWith(".png"))
-                    textureFilename = textureFilename.Substring(0, textureFilename.Length - 4);
-
-                // 原始 texture 路径（去掉 .png）
-                string originalTexture = item["texture"].ToString();
-                if (originalTexture.EndsWith(".png"))
-                    originalTexture = originalTexture.Substring(0, originalTexture.Length - 4);
-
-                var skin = new SkinData
+                _skins.Clear();
+                foreach (var itemObj in list)
                 {
-                    Id = textureFilename,
-                    OriginalId = item["ID"].ToString(),
-                    OriginalTexture = originalTexture,
-                    TexturePath = "",
-                    Name = item["name"].ToString(),
-                    Author = item["by"].ToString(),
-                    FromImport = true
-                };
-                _skins.Add(skin);
+                    var jObj = itemObj as Newtonsoft.Json.Linq.JObject;
+                    if (jObj == null) throw new Exception("皮肤数据格式无效");
+                    ImportSkinItem(jObj);
+                }
             }
+            else
+            {
+                if (jArray.Count > MaxSkins)
+                    throw new Exception("皮肤数量超过限制（最多 " + MaxSkins + " 个）");
+
+                _skins.Clear();
+                foreach (var token in jArray)
+                {
+                    var jObj = token as Newtonsoft.Json.Linq.JObject;
+                    if (jObj == null) continue;
+                    ImportSkinItem(jObj);
+                }
+            }
+        }
+
+        private void ImportSkinItem(Newtonsoft.Json.Linq.JObject item)
+        {
+            if (!item.ContainsKey("ID") || !item.ContainsKey("name") ||
+                !item.ContainsKey("by") || !item.ContainsKey("texture"))
+                throw new Exception("皮肤数据缺少必要字段");
+
+            string texturePath = item["texture"].ToString();
+            string textureFilename = texturePath.Contains("/")
+                ? texturePath.Substring(texturePath.LastIndexOf('/') + 1)
+                : texturePath;
+
+            if (textureFilename.EndsWith(".png"))
+                textureFilename = textureFilename.Substring(0, textureFilename.Length - 4);
+
+            string originalTexture = item["texture"].ToString();
+            if (originalTexture.EndsWith(".png"))
+                originalTexture = originalTexture.Substring(0, originalTexture.Length - 4);
+
+            var skin = new SkinData
+            {
+                Id = textureFilename,
+                OriginalId = item["ID"].ToString(),
+                OriginalTexture = originalTexture,
+                TexturePath = "",
+                Name = item["name"].ToString(),
+                Author = item["by"].ToString(),
+                FromImport = true
+            };
+            _skins.Add(skin);
         }
     }
 }

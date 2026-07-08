@@ -192,8 +192,16 @@ namespace NpcSkinMaker
         {
             using (var archive = ZipFile.OpenRead(zipPath))
             {
-                // 查找皮肤配置文件
-                var configEntry = archive.Entries.FirstOrDefault(x => x.Name.EndsWith("_skindlc.json"));
+                // 查找皮肤配置文件（支持多种命名：*_skindlc.json, npcsklist.json 等）
+                var configEntry = archive.Entries.FirstOrDefault(x =>
+                    x.Name.EndsWith("_skindlc.json") || x.Name == "npcsklist.json");
+                if (configEntry == null)
+                {
+                    // 最后兜底：扫描 modconfigs 目录下任意 json
+                    configEntry = archive.Entries.FirstOrDefault(x =>
+                        x.FullName.Contains("modconfigs/") &&
+                        x.Name.EndsWith(".json"));
+                }
                 if (configEntry == null)
                     throw new Exception("ZIP 文件中未找到皮肤配置文件");
 
@@ -225,9 +233,9 @@ namespace NpcSkinMaker
 
                     string textureFilename = textureBasename + ".png";
 
-                    // 在 ZIP 中查找贴图文件
+                    // 在 ZIP 中查找贴图文件（支持子目录，匹配文件名）
                     var textureEntry = archive.Entries.FirstOrDefault(x =>
-                        x.FullName.EndsWith("npc_dlcskin/" + textureFilename, StringComparison.OrdinalIgnoreCase));
+                        x.Name.Equals(textureFilename, StringComparison.OrdinalIgnoreCase));
 
                     if (textureEntry == null)
                         throw new Exception("未找到贴图文件: " + textureFilename);
