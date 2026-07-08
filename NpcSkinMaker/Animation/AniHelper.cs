@@ -209,14 +209,20 @@ namespace NpcSkinMaker
         /// 每个元素从 Y=-20 下落，带回弹，错峰 80ms </summary>
         public static void PageEnterAnimation(FrameworkElement container, int baseDelay = 0)
         {
+            // 先确保容器可见
+            container.Opacity = 1;
+
             if (ControlEnabled > 0)
                 return;
 
             int delay = baseDelay;
-            foreach (var child in GetTopLevelChildren(container))
+            var children = GetTopLevelChildren(container);
+            bool hasChildren = false;
+            foreach (var child in children)
             {
                 var fe = child as FrameworkElement;
                 if (fe == null) continue;
+                hasChildren = true;
 
                 // 初始状态：上方 20px + 透明
                 var transform = EnsureTranslateTransform(fe);
@@ -232,6 +238,10 @@ namespace NpcSkinMaker
                 // 按行错峰 80ms
                 delay += 80;
             }
+
+            // 如果没有子元素，不动画，直接显示
+            if (!hasChildren)
+                container.Opacity = 1;
         }
 
         /// <summary>页面退场动画：顶层子元素整体淡出 + 微微上飘 </summary>

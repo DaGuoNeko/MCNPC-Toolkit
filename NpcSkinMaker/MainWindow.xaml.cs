@@ -25,7 +25,15 @@ namespace NpcSkinMaker
         private readonly List<NavButton> _navButtons = new List<NavButton>();
         private int _currentPageIndex = -1;
         private int _currentTool = 0;
-        private bool _isTransitioning = false; // 防止快速点击导致的动画叠加 // 0=皮肤, 1=模型
+        private bool _isTransitioning = false; // 防止快速点击导致的动画叠加
+
+        // 页面缓存（避免每次切换都重新创建）
+        private PageHome _pageHome;
+        private PageModelHome _pageModelHome;
+        private PageMcTools _pageMcTools;
+        private Page3DText _page3DText;
+        private PageSettings _pageSettings;
+        private PageAbout _pageAbout; // 0=皮肤, 1=模型
 
         private readonly List<TabButton> _tabButtons = new List<TabButton>();
 
@@ -41,6 +49,9 @@ namespace NpcSkinMaker
         public PackageBuilder PackageBuilder { get { return _packageBuilder; } }
         public ModelPackageBuilder ModelPackageBuilder { get { return _modelPackageBuilder; } }
 
+        private bool _isMaximized = false;
+        private double _savedLeft, _savedTop, _savedWidth, _savedHeight;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -52,6 +63,8 @@ namespace NpcSkinMaker
 
             // 标题栏按钮事件 - 使用 Click 事件（MyIconButton 内部先触发 Click 再设 e.Handled=true）
             BtnMin.Click += (s, e) => { WindowState = WindowState.Minimized; };
+            BtnMax.Click += (s, e) => ToggleMaximize();
+
             BtnClose.Click += (s, e) => { Close(); };
 
             // 标题栏拖拽移动 - 只在点击非按钮区域时触发
@@ -199,6 +212,11 @@ namespace NpcSkinMaker
 
             _currentTool = tool;
 
+            // 切工具时清掉首页缓存
+            _pageHome = null;
+            _pageModelHome = null;
+            _pageMcTools = null;
+
             // 更新 Tab 选中状态
             foreach (var btn in _tabButtons)
                 btn.IsSelected = btn.Index == tool;
@@ -212,8 +230,9 @@ namespace NpcSkinMaker
         {
             AddNavButton("首页", MyIconButton.IconHome, 0);
             AddNavButton("MC 工具箱", MyIconButton.IconCreeper, 1);
-            AddNavButton("设置", MyIconButton.IconSettings, 2);
-            AddNavButton("关于", MyIconButton.IconInfo, 3);
+            AddNavButton("3D 文字", MyIconButton.IconAdd, 2);
+            AddNavButton("设置", MyIconButton.IconSettings, 3);
+            AddNavButton("关于", MyIconButton.IconInfo, 4);
         }
 
         private void AddNavButton(string title, string icon, int index)
@@ -244,21 +263,29 @@ namespace NpcSkinMaker
                 case 0:
                     newPage = _currentTool == 0 ? (FrameworkElement)new PageHome() : (FrameworkElement)new PageModelHome();
                     break;
-                case 1: newPage = new PageMcTools(); break;
-                case 2: newPage = new PageSettings(); break;
-                case 3: newPage = new PageAbout(); break;
+                case 1:
+                    if (_pageMcTools == null) _pageMcTools = new PageMcTools();
+                    newPage = _pageMcTools;
+                    break;
+                case 2:
+                    if (_page3DText == null) _page3DText = new Page3DText();
+                    newPage = _page3DText;
+                    break;
+                case 3: newPage = new PageSettings(); break;
+                case 4: newPage = new PageAbout(); break;
             }
 
             if (newPage != null)
             {
                 PanRightContent.Children.Clear();
                 PanRightContent.Children.Add(newPage);
-                // 延迟到渲染完成后再播动画，避免闪退
+
+                // 下一帧播入场动画
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try { AniHelper.PageEnterAnimation(newPage); }
                     catch (Exception ex) { Logger.Error("页面动画异常: " + ex.Message); }
-                }), DispatcherPriority.Background);
+                }), DispatcherPriority.Loaded);
             }
 
             _currentPageIndex = index;
@@ -316,6 +343,48 @@ namespace NpcSkinMaker
         private void UpdateClipRegion()
         {
             RectForm.Rect = new Rect(0, 0, BorderForm.ActualWidth, BorderForm.ActualHeight);
+        }
+
+        private void ToggleMaximize()
+        {
+            if (_isMaximized)
+            {
+                // 还原
+                _isMaximized = false;
+                PanMain.Margin = new Thickness(10);
+                BorderForm.Margin = new Thickness(8);
+                Left = _savedLeft;
+                Top = _savedTop;
+                Width = _savedWidth;
+                Height = _savedHeight;
+                BtnMax.Logo = MyIconButton.IconMaximize;
+            }
+            else
+            {
+                // 最大化
+                _isMaximized = true;
+                _savedLeft = Left;
+                _savedTop = Top;
+                _savedWidth = Width;
+                _savedHeight = Height;
+
+                var screen = System.Windows.Forms.Screen.FromHandle(
+                    new System.Windows.Interop.WindowInteropHelper(this).Handle);
+                var wa = screen.WorkingArea;
+
+                var source = System.Windows.PresentationSource.FromVisual(this);
+                double dpiX = source != null ? source.CompositionTarget.TransformToDevice.M11 : 1.0;
+                double dpiY = source != null ? source.CompositionTarget.TransformToDevice.M22 : 1.0;
+
+                PanMain.Margin = new Thickness(0);
+                BorderForm.Margin = new Thickness(0);
+
+                Left = wa.Left / dpiX;
+                Top = wa.Top / dpiY;
+                Width = wa.Width / dpiX;
+                Height = wa.Height / dpiY;
+                BtnMax.Logo = MyIconButton.IconRestore;
+            }
         }
 
         private void LoadBackground()

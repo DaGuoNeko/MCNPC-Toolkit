@@ -74,6 +74,8 @@
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                             <local:MyIconButton x:Name="BtnMin" Logo="{x:Static local:MyIconButton.IconMinimize}"
                                                 Theme="White" Width="36" Height="32" Margin="0,0,4,0" />
+                            <local:MyIconButton x:Name="BtnMax" Logo="{x:Static local:MyIconButton.IconMaximize}"
+                                                Theme="White" Width="36" Height="32" Margin="0,0,4,0" />
                             <local:MyIconButton x:Name="BtnClose" Logo="{x:Static local:MyIconButton.IconClose}"
                                                 Theme="White" Width="36" Height="32" />
                         </StackPanel>

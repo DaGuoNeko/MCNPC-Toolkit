@@ -77,7 +77,9 @@ namespace NpcSkinMaker
         {
             if (msg == WM_GETMINMAXINFO)
             {
-                HandleGetMinMaxInfo(lParam);
+                // 最大化时不限制尺寸，让窗口占满工作区
+                if (_window.WindowState != WindowState.Maximized)
+                    HandleGetMinMaxInfo(lParam);
                 handled = true;
             }
             else if (msg == WM_SIZING)
@@ -94,6 +96,7 @@ namespace NpcSkinMaker
         /// </summary>
         private void HandleSizing(IntPtr wParam, IntPtr lParam)
         {
+            // 不再强制 16:9 比例，只确保不小于最小尺寸
             int side = wParam.ToInt32();
             var rect = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
 
@@ -101,91 +104,27 @@ namespace NpcSkinMaker
             int height = rect.Bottom - rect.Top;
             if (width <= 0 || height <= 0) return;
 
-            // 屏幕缩放比
             var source = PresentationSource.FromVisual(_window);
             double dpiX = source != null ? source.CompositionTarget.TransformToDevice.M11 : 1.0;
             if (dpiX == 0) dpiX = 1.0;
 
             int minW = (int)(_minWidth * dpiX);
-            int minH = (int)(_minHeight * dpiX); // 用宽度的缩放比近似（同比例下一致）
+            int minH = (int)(_minHeight * dpiX);
 
-            // 根据 16:9 计算修正
-            // 判断当前是以宽还是高为主
-            switch (side)
+            // 如果小于最小尺寸，修正
+            if (width < minW)
             {
-                case WMSZ_RIGHT:
-                case WMSZ_LEFT:
-                    // 左右拖拽：宽度变了，根据宽度修正高度（保持中心位置）
-                    {
-                        int newHeight = (int)(width / _aspectRatio);
-                        if (newHeight < minH) { newHeight = minH; width = (int)(newHeight * _aspectRatio); }
-                        int midY = (rect.Top + rect.Bottom) / 2;
-                        rect.Top = midY - newHeight / 2;
-                        rect.Bottom = rect.Top + newHeight;
-                        if (side == WMSZ_LEFT)
-                            rect.Left = rect.Right - width;
-                        else
-                            rect.Right = rect.Left + width;
-                        break;
-                    }
-                case WMSZ_TOP:
-                case WMSZ_BOTTOM:
-                    // 上下拖拽：高度变了，根据高度修正宽度（保持中心位置）
-                    {
-                        int newWidth = (int)(height * _aspectRatio);
-                        if (newWidth < minW) { newWidth = minW; height = (int)(newWidth / _aspectRatio); }
-                        int midX = (rect.Left + rect.Right) / 2;
-                        rect.Left = midX - newWidth / 2;
-                        rect.Right = rect.Left + newWidth;
-                        if (side == WMSZ_TOP)
-                            rect.Top = rect.Bottom - height;
-                        else
-                            rect.Bottom = rect.Top + height;
-                        break;
-                    }
-                case WMSZ_TOPLEFT:
-                case WMSZ_TOPRIGHT:
-                case WMSZ_BOTTOMLEFT:
-                case WMSZ_BOTTOMRIGHT:
-                    // 角拖拽：以变化量大的边为准
-                    {
-                        // 计算保持比例后哪个维度更大
-                        double ratioFromWidth = width / _aspectRatio;
-                        double ratioFromHeight = height * _aspectRatio;
-
-                        // 取需要较大变化的那个维度
-                        if (ratioFromWidth > height)
-                        {
-                            // 宽度主导，高度偏小 -> 增大高度
-                            int newHeight = (int)(width / _aspectRatio);
-                            if (newHeight < minH) { newHeight = minH; width = (int)(newHeight * _aspectRatio); }
-                            if (side == WMSZ_TOPLEFT || side == WMSZ_TOPRIGHT)
-                                rect.Top = rect.Bottom - newHeight;
-                            else
-                                rect.Bottom = rect.Top + newHeight;
-                            // 修正宽度
-                            if (side == WMSZ_TOPLEFT || side == WMSZ_BOTTOMLEFT)
-                                rect.Left = rect.Right - width;
-                            else
-                                rect.Right = rect.Left + width;
-                        }
-                        else
-                        {
-                            // 高度主导，宽度偏小 -> 增大宽度
-                            int newWidth = (int)(height * _aspectRatio);
-                            if (newWidth < minW) { newWidth = minW; height = (int)(newWidth / _aspectRatio); }
-                            if (side == WMSZ_TOPLEFT || side == WMSZ_BOTTOMLEFT)
-                                rect.Left = rect.Right - newWidth;
-                            else
-                                rect.Right = rect.Left + newWidth;
-                            // 修正高度
-                            if (side == WMSZ_TOPLEFT || side == WMSZ_TOPRIGHT)
-                                rect.Top = rect.Bottom - height;
-                            else
-                                rect.Bottom = rect.Top + height;
-                        }
-                        break;
-                    }
+                if (side == WMSZ_LEFT || side == WMSZ_TOPLEFT || side == WMSZ_BOTTOMLEFT)
+                    rect.Left = rect.Right - minW;
+                else
+                    rect.Right = rect.Left + minW;
+            }
+            if (height < minH)
+            {
+                if (side == WMSZ_TOP || side == WMSZ_TOPLEFT || side == WMSZ_TOPRIGHT)
+                    rect.Top = rect.Bottom - minH;
+                else
+                    rect.Bottom = rect.Top + minH;
             }
 
             Marshal.StructureToPtr(rect, lParam, true);
@@ -205,46 +144,29 @@ namespace NpcSkinMaker
         /// </summary>
         private void HandleGetMinMaxInfo(IntPtr lParam)
         {
-            // MINMAXINFO 结构
             var mmi = (MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(MINMAXINFO));
 
-            // 获取工作区（排除任务栏）
-            var monitor = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(_window).Handle);
+            var hwnd = new WindowInteropHelper(_window).Handle;
+            var monitor = System.Windows.Forms.Screen.FromHandle(hwnd);
             var workArea = monitor.WorkingArea;
 
-            int maxW = workArea.Width;
-            int maxH = workArea.Height;
-
-            // DPI 缩放（WPF 使用设备无关像素，系统使用物理像素）
             var source = PresentationSource.FromVisual(_window);
-            double dpiScaleX = source != null ? source.CompositionTarget.TransformToDevice.M11 : 1.0;
-            double dpiScaleY = source != null ? source.CompositionTarget.TransformToDevice.M12 : 1.0;
-            if (dpiScaleX == 0) dpiScaleX = 1.0;
-            if (dpiScaleY == 0) dpiScaleY = 1.0;
+            double dpiX = source != null ? source.CompositionTarget.TransformToDevice.M11 : 1.0;
+            double dpiY = source != null ? source.CompositionTarget.TransformToDevice.M22 : 1.0;
+            if (dpiX == 0) dpiX = 1.0;
+            if (dpiY == 0) dpiY = 1.0;
 
-            // 将 WPF 逻辑像素的最小值转换为系统物理像素
-            int minW = (int)(_minWidth * dpiScaleX);
-            int minH = (int)(_minHeight * dpiScaleY);
+            // 最小尺寸
+            mmi.ptMinTrackSize.x = (int)(_minWidth * dpiX);
+            mmi.ptMinTrackSize.y = (int)(_minHeight * dpiY);
 
-            // 限制最大尺寸也保持 16:9
-            // 如果工作区太宽，用高度限制宽度；反之用宽度限制高度
-            if (maxW / (double)maxH > _aspectRatio)
-            {
-                // 工作区比 16:9 更宽，以高度为准
-                maxW = (int)(maxH * _aspectRatio);
-            }
-            else
-            {
-                // 工作区比 16:9 更窄，以宽度为准
-                maxH = (int)(maxW / _aspectRatio);
-            }
-
-            mmi.ptMaxSize.x = maxW;
-            mmi.ptMaxSize.y = maxH;
-            mmi.ptMaxTrackSize.x = maxW;
-            mmi.ptMaxTrackSize.y = maxH;
-            mmi.ptMinTrackSize.x = minW;
-            mmi.ptMinTrackSize.y = minH;
+            // 最大化时占满工作区（自动避开任务栏）
+            mmi.ptMaxSize.x = workArea.Width;
+            mmi.ptMaxSize.y = workArea.Height;
+            mmi.ptMaxPosition.x = workArea.X;
+            mmi.ptMaxPosition.y = workArea.Y;
+            mmi.ptMaxTrackSize.x = workArea.Width;
+            mmi.ptMaxTrackSize.y = workArea.Height;
 
             Marshal.StructureToPtr(mmi, lParam, true);
         }

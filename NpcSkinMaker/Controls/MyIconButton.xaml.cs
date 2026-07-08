@@ -42,6 +42,8 @@ namespace NpcSkinMaker
         // 常用 SVG path 数据
         public static readonly string IconClose = "F1 M2,0 L0,2 8,10 0,18 2,20 10,12 18,20 20,18 12,10 20,2 18,0 10,8 2,0Z";
         public static readonly string IconMinimize = "F1 M0,0 h15 v2 h-15 v-2 Z";
+        public static readonly string IconMaximize = "F1 M0,0 h15 v15 h-15 Z M2,2 h11 v11 h-11 Z";
+        public static readonly string IconRestore = "F1 M0,3 h12 v12 h-12 Z M3,0 h12 v12 M3,3 v-3 M12,0 h3 v3";
         public static readonly string IconBack = "F1 M10,2 L2,10 10,18 12,16 6,10 12,4 10,2 Z";
         public static readonly string IconSearch = "F1 M7,0 C3.13,0 0,3.13 0,7 C0,10.87 3.13,14 7,14 C8.65,14 10.17,13.43 11.38,12.47 L11.38,12.47 L16.96,18.05 L18.05,16.96 L12.47,11.38 C13.43,10.17 14,8.65 14,7 C14,3.13 10.87,0 7,0 Z M7,2 C9.76,2 12,4.24 12,7 C12,9.76 9.76,12 7,12 C4.24,12 2,9.76 2,7 C2,4.24 4.24,2 7,2 Z";
         public static readonly string IconAdd = "F1 M6,0 L6,6 0,6 0,8 6,8 6,14 8,14 8,8 14,8 14,6 8,6 8,0 6,0 Z";
