@@ -1,0 +1,52 @@
+<Window x:Class="NpcSkinMaker.MyMsgBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:NpcSkinMaker"
+        Title="提示"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize">
+
+    <Grid x:Name="PanRoot">
+        <!-- 遮罩（黑色 50% 透明度，覆盖主窗口区域） -->
+        <Border x:Name="Backdrop" Background="#80000000" Opacity="0" />
+
+        <!-- 弹窗主体（居中） -->
+        <Border x:Name="PanContent" Background="#FBFBFB" CornerRadius="7"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                MinWidth="360" MaxWidth="440" Margin="40">
+            <Border.Effect>
+                <DropShadowEffect Color="#343D4A" BlurRadius="20" ShadowDepth="4" Opacity="0.3" />
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- 标题区（PCL2 风格：大标题 + 分隔线） -->
+                <StackPanel x:Name="PanTitle" Grid.Row="0" Margin="22,18,22,0">
+                    <Grid>
+                        <TextBlock x:Name="LabTitle" Text="提示" FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource ColorBrush2}" Margin="0,-1,40,0" />
+                    </Grid>
+                    <Rectangle x:Name="PanTitleLine" Height="2" Fill="{DynamicResource ColorBrush2}" Margin="0,8,0,0" />
+                </StackPanel>
+
+                <!-- 消息内容 -->
+                <StackPanel Grid.Row="1" Margin="22,16,22,8">
+                    <TextBlock x:Name="LabMessage" Text="" FontSize="15" TextWrapping="Wrap"
+                               Foreground="#5C5C5C" LineHeight="20" />
+                </StackPanel>
+
+                <!-- 按钮区 -->
+                <StackPanel x:Name="PanButtons" Grid.Row="2" Orientation="Horizontal"
+                            HorizontalAlignment="Right" Margin="22,0,22,16">
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

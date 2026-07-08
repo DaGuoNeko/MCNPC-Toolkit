@@ -1,0 +1,76 @@
+<UserControl x:Class="NpcSkinMaker.PageAbout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:NpcSkinMaker"
+             Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,6">
+        <StackPanel x:Name="PanContent">
+
+            <Border CornerRadius="7" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1"
+                    BorderBrush="{DynamicResource ColorBrushGray5}" Padding="16,12" Margin="0,0,0,12">
+                <Border.Effect>
+                    <DropShadowEffect Color="{DynamicResource ColorObject4}" BlurRadius="10"
+                                      ShadowDepth="0" Opacity="0.08" Direction="270" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="关于" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,8" />
+
+                    <!-- Logo -->
+                    <local:LogoIcon Width="56" Height="56" Stroke="{DynamicResource ColorBrush2}"
+                                    Fill="#22FFFFFF" StrokeThickness="1.5"
+                                    HorizontalAlignment="Left" Margin="0,0,0,16" />
+
+                    <TextBlock Text="MCNPC 拓展制作工具箱" FontSize="18" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,4" />
+                    <TextBlock FontSize="12" Margin="0,0,0,4">
+                        <Run Text="UI 风格参考 " Foreground="{DynamicResource ColorBrushGray3}" />
+                        <Hyperlink x:Name="LinkPCL" NavigateUri="https://github.com/Meloong-Git/PCL"
+                                   Foreground="{DynamicResource ColorBrush3}" TextDecorations="Underline">
+                            PCL2 (Plain Craft Launcher 2)
+                        </Hyperlink>
+                    </TextBlock>
+                    <TextBlock Text="版本 2.0.0" FontSize="13"
+                               Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,12" />
+
+                    <TextBlock Text="一款用于为网易中国版 Minecraft 基岩版制作 NPC DLC 拓展包的桌面工具箱，支持皮肤拓展和模型拓展两种模式。"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}"
+                               TextWrapping="Wrap" Margin="0,0,0,8" />
+
+                    <TextBlock Text="作者: 大果喵 (DaGuoNeko)" FontSize="13"
+                               Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,4" />
+                    <TextBlock FontSize="13" Margin="0,0,0,4">
+                        <Run Text="源代码: " Foreground="{DynamicResource ColorBrushGray2}" />
+                        <Hyperlink x:Name="LinkRepo" NavigateUri="https://github.com/DaGuoNeko/MCNPC-Toolkit"
+                                   Foreground="{DynamicResource ColorBrush3}" TextDecorations="Underline">
+                            github.com/DaGuoNeko/MCNPC-Toolkit
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <Border CornerRadius="7" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1"
+                    BorderBrush="{DynamicResource ColorBrushGray5}" Padding="16,12" Margin="0,0,0,12">
+                <Border.Effect>
+                    <DropShadowEffect Color="{DynamicResource ColorObject4}" BlurRadius="10"
+                                      ShadowDepth="0" Opacity="0.08" Direction="270" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="使用说明" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,8" />
+                    <TextBlock Text="1. 通过顶部切换栏选择「皮肤拓展制作」或「模型拓展制作」"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                    <TextBlock Text="2. 皮肤模式：添加 PNG 贴图，填写名称/作者，导出 ZIP"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                    <TextBlock Text="3. 模型模式：添加 .geo.json 模型 + 贴图 + 动画，配置碰撞箱等参数，导出 ZIP"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                    <TextBlock Text="4. 导出的 ZIP 可以直接导入 Minecraft 游戏使用"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                    <TextBlock Text="5. 皮肤模式支持导入 ZIP 重新编辑之前导出的皮肤包"
+                               FontSize="13" Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

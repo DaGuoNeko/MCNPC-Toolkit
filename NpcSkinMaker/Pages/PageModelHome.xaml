@@ -1,0 +1,95 @@
+<UserControl x:Class="NpcSkinMaker.PageModelHome"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:NpcSkinMaker"
+             Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,6">
+        <StackPanel x:Name="PanContent">
+
+            <!-- 顶部信息 -->
+            <Border CornerRadius="7" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1"
+                    BorderBrush="{DynamicResource ColorBrushGray5}" Padding="16,12" Margin="0,0,0,12">
+                <Border.Effect>
+                    <DropShadowEffect Color="{DynamicResource ColorObject4}" BlurRadius="10"
+                                      ShadowDepth="0" Opacity="0.08" Direction="270" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="模型拓展制作" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,8" />
+                    <TextBlock Text="添加 3D 模型（.geo.json + 贴图 + 动画），生成可导入的 NPC 模型拓展包 ZIP。"
+                               Foreground="{DynamicResource ColorBrushGray2}" FontSize="12"
+                               Margin="0,0,0,10" TextWrapping="Wrap" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Name="LabCount" Text="模型数量: 0/500" FontSize="13"
+                                   FontWeight="Bold" Foreground="{DynamicResource ColorBrush2}" />
+                    </StackPanel>
+
+                    <!-- 操作按钮 -->
+                    <WrapPanel Margin="0,0,0,4">
+                        <local:MyButton x:Name="BtnAdd" Text="添加模型" ColorType="Normal" Margin="0,0,8,8" />
+                        <local:MyButton x:Name="BtnMoveUp" Text="上移" ColorType="Normal" Margin="0,0,8,8" />
+                        <local:MyButton x:Name="BtnMoveDown" Text="下移" ColorType="Normal" Margin="0,0,8,8" />
+                        <local:MyButton x:Name="BtnClear" Text="清空列表" ColorType="Red" Margin="0,0,8,8" />
+                        <local:MyButton x:Name="BtnExport" Text="导出 ZIP 拓展包" ColorType="Highlight" Margin="0,0,8,8" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Toast 提示 -->
+            <local:MyHint x:Name="HintToast" Margin="0,0,0,12" />
+
+            <!-- 模型列表 -->
+            <Border CornerRadius="7" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1"
+                    BorderBrush="{DynamicResource ColorBrushGray5}" Padding="16,12">
+                <Border.Effect>
+                    <DropShadowEffect Color="{DynamicResource ColorObject4}" BlurRadius="10"
+                                      ShadowDepth="0" Opacity="0.08" Direction="270" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="模型列表" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,8" />
+
+                    <!-- 列表标题行 -->
+                    <Grid Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="120" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="#" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="1" Text="显示名称" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="2" Text="标识符" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="3" Text="来源" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="4" Text="贴图" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="5" Text="动画" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                        <TextBlock Grid.Column="6" Text="操作" FontSize="12" Foreground="{DynamicResource ColorBrushGray3}" />
+                    </Grid>
+
+                    <Border BorderBrush="{DynamicResource ColorBrushGray5}" BorderThickness="0,0,0,1" Margin="0,0,0,6" />
+
+                    <!-- 模型列表容器 -->
+                    <StackPanel x:Name="PanModelList" />
+
+                    <!-- 空列表提示 -->
+                    <Border x:Name="PanEmpty" Padding="20,40" Visibility="Visible">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Path Data="F1 M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z M12,7 C13.1,7 14,7.9 14,9 C14,10.1 13.1,11 12,11 C10.9,11 10,10.1 10,9 C10,7.9 10.9,7 12,7 Z M14,17 L10,17 L10,15 L14,15 L14,17 Z"
+                                  Width="48" Height="48" Stretch="Uniform"
+                                  Fill="{DynamicResource ColorBrushGray4}" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                            <TextBlock Text="还没有添加模型" FontSize="14" Foreground="{DynamicResource ColorBrushGray3}"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="点击「添加模型」开始创建" FontSize="12"
+                                       Foreground="{DynamicResource ColorBrushGray4}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

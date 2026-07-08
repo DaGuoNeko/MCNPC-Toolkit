@@ -1,0 +1,242 @@
+<Window x:Class="NpcSkinMaker.EditModelDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:NpcSkinMaker"
+        Title="添加模型" Width="700" Height="680"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="{x:Null}" WindowStartupLocation="CenterOwner">
+    <Border Margin="8" Background="#FBFBFB" CornerRadius="7">
+        <Border.Effect>
+            <DropShadowEffect Color="#343D4A" BlurRadius="20" ShadowDepth="4" Opacity="0.25" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- 标题区（PCL 风格：大标题 + 分隔线） -->
+            <StackPanel Grid.Row="0" Margin="22,18,22,0">
+                <Grid>
+                    <TextBlock x:Name="LabTitle" Text="添加模型" FontSize="20" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush2}" Margin="0,-1,40,0" />
+                    <local:MyIconButton x:Name="BtnClose" Logo="{x:Static local:MyIconButton.IconClose}"
+                                        Theme="Color" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                        Width="28" Height="28" />
+                </Grid>
+                <Rectangle Height="2" Fill="{DynamicResource ColorBrush2}" Margin="0,8,0,0" />
+            </StackPanel>
+
+            <!-- 内容区 -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="22,16,22,8">
+                <StackPanel>
+
+                    <!-- ===== 卡片：基本信息 ===== -->
+                    <Border Background="#F5FFFFFF" CornerRadius="5" Padding="0" Margin="0,0,0,15">
+                        <Border.Effect>
+                            <DropShadowEffect Color="{DynamicResource ColorObject1}" BlurRadius="6"
+                                              ShadowDepth="0" Opacity="0.06" />
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="基本信息" FontSize="13" FontWeight="Bold"
+                                       Foreground="{DynamicResource ColorBrush1}" Margin="15,12,0,0" />
+                            <StackPanel Margin="20,36,20,20">
+
+                                <Grid Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="显示名称" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,25,0" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtDisplayName" Grid.Row="0" Grid.Column="1" Hint="如：蝙蝠" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="自定义名称" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,25,0" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtCustomName" Grid.Row="2" Grid.Column="1" Hint="如：my_wolf" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="来源标注" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,25,0" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtSource" Grid.Row="4" Grid.Column="1" Hint="如：原版 / 自制" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="碰撞箱 (宽 / 高)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,25,0" FontSize="13" />
+                                    <Grid Grid.Row="6" Grid.Column="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="80" />
+                                        </Grid.ColumnDefinitions>
+                                        <local:MyTextBox x:Name="TxtCollisionW" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                        <local:MyTextBox x:Name="TxtCollisionH" Grid.Column="1" VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="启用附件" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,25,0" FontSize="13" />
+                                    <CheckBox x:Name="ChkAttachables" Grid.Row="8" Grid.Column="1" Content="enable_attachables" IsChecked="True" VerticalAlignment="Center" FontSize="13" />
+
+                                </Grid>
+
+                                <!-- identifier 预览 -->
+                                <TextBlock x:Name="LabIdPreview" Text="→ customnpc:_dlcnpc" FontSize="11"
+                                           Foreground="{DynamicResource ColorBrush3}" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ===== 卡片：实体动画 ===== -->
+                    <Border Background="#F5FFFFFF" CornerRadius="5" Padding="0" Margin="0,0,0,15">
+                        <Border.Effect>
+                            <DropShadowEffect Color="{DynamicResource ColorObject1}" BlurRadius="6"
+                                              ShadowDepth="0" Opacity="0.06" />
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="实体动画（留空使用默认）" FontSize="13" FontWeight="Bold"
+                                       Foreground="{DynamicResource ColorBrush1}" Margin="15,12,0,0" />
+                            <StackPanel Margin="20,36,20,20">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                        <RowDefinition Height="9" />
+                                        <RowDefinition Height="28" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="idle" VerticalAlignment="Center" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtIdleAnim" Grid.Row="0" Grid.Column="1" Hint="留空 → pass" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="walk" VerticalAlignment="Center" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtWalkAnim" Grid.Row="2" Grid.Column="1" Hint="留空 → 同 idle" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="walka" VerticalAlignment="Center" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtWalkaAnim" Grid.Row="4" Grid.Column="1" Hint="留空 → 同 walk" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="attack" VerticalAlignment="Center" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtAttackAnim" Grid.Row="6" Grid.Column="1" Hint="留空 → pass" VerticalAlignment="Center" />
+
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="death" VerticalAlignment="Center" FontSize="13" />
+                                    <local:MyTextBox x:Name="TxtDeathAnim" Grid.Row="8" Grid.Column="1" Hint="留空 → default.death" VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ===== 卡片：文件资源 ===== -->
+                    <Border Background="#F5FFFFFF" CornerRadius="5" Padding="0" Margin="0,0,0,15">
+                        <Border.Effect>
+                            <DropShadowEffect Color="{DynamicResource ColorObject1}" BlurRadius="6"
+                                              ShadowDepth="0" Opacity="0.06" />
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="文件资源" FontSize="13" FontWeight="Bold"
+                                       Foreground="{DynamicResource ColorBrush1}" Margin="15,12,0,0" />
+                            <StackPanel Margin="20,36,20,20">
+                                <Grid Margin="0,0,0,9">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="模型 .geo.json" VerticalAlignment="Center" FontSize="13" Margin="0,0,15,0" />
+                                    <local:MyTextBox x:Name="TxtGeoPath" Grid.Column="1" Hint="必须选择 .geo.json" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <local:MyButton x:Name="BtnBrowseGeo" Grid.Column="2" Text="选择" VerticalAlignment="Center" Padding="13,4" />
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="UI 预览图" VerticalAlignment="Center" FontSize="13" Margin="0,0,15,0" />
+                                    <local:MyTextBox x:Name="TxtPreviewPath" Grid.Column="1" Hint="留空则不复制（可选）" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <local:MyButton x:Name="BtnBrowsePreview" Grid.Column="2" Text="选择" VerticalAlignment="Center" Padding="13,4" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ===== 卡片：贴图 / 动画 / 皮肤 页签 ===== -->
+                    <Border Background="#F5FFFFFF" CornerRadius="5" Padding="0" Margin="0,0,0,15">
+                        <Border.Effect>
+                            <DropShadowEffect Color="{DynamicResource ColorObject1}" BlurRadius="6"
+                                              ShadowDepth="0" Opacity="0.06" />
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="贴图 / 动画 / 皮肤" FontSize="13" FontWeight="Bold"
+                                       Foreground="{DynamicResource ColorBrush1}" Margin="15,12,0,0" />
+                            <Grid Margin="20,36,20,20" Height="180">
+                                <TabControl x:Name="Tabs">
+                                    <TabItem Header="贴图 *">
+                                        <Grid Margin="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Text="顺序对应 default / default1 / default2... 渲染控制器自动匹配" FontSize="11" Foreground="{DynamicResource ColorBrushGray3}" Margin="0,0,0,4" />
+                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                                <StackPanel x:Name="PanTextureList" />
+                                            </ScrollViewer>
+                                            <local:MyButton x:Name="BtnAddTexture" Grid.Row="2" Text="+ 添加贴图" HorizontalAlignment="Left" Margin="0,4,0,0" Padding="13,4" />
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="动画列表">
+                                        <Grid Margin="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Text="动画名会出现在 NPC 的动画选择列表中" FontSize="11" Foreground="{DynamicResource ColorBrushGray3}" Margin="0,0,0,4" />
+                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                                <StackPanel x:Name="PanAnimList" />
+                                            </ScrollViewer>
+                                            <local:MyButton x:Name="BtnAddAnim" Grid.Row="2" Text="+ 添加动画" HorizontalAlignment="Left" Margin="0,4,0,0" Padding="13,4" />
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="皮肤变体">
+                                        <Grid Margin="4">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Text="skinid 从 0 开始，对应贴图列表的 default / default1..." FontSize="11" Foreground="{DynamicResource ColorBrushGray3}" Margin="0,0,0,4" />
+                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                                <StackPanel x:Name="PanSkinList" />
+                                            </ScrollViewer>
+                                            <local:MyButton x:Name="BtnAddSkin" Grid.Row="2" Text="+ 添加皮肤" HorizontalAlignment="Left" Margin="0,4,0,0" Padding="13,4" />
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 底部按钮（PCL 风格：右对齐，间隔 12px） -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="22,0,22,16">
+                <local:MyButton x:Name="BtnConfirm" Text="确定" ColorType="Highlight" Margin="0,0,12,0" Padding="20,4" MinWidth="100" />
+                <local:MyButton x:Name="BtnCancel" Text="取消" Padding="20,4" MinWidth="100" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

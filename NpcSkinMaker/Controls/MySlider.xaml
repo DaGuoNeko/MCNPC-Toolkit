@@ -1,0 +1,23 @@
+<Border x:Class="NpcSkinMaker.MySlider"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         MinHeight="16" Background="Transparent" Cursor="Hand"
+         Focusable="True">
+    <Grid x:Name="PanMain" HorizontalAlignment="Stretch">
+        <!-- 轨道未填充部分（灰色，靠右对齐） -->
+        <Line x:Name="LineBack" Stroke="{DynamicResource ColorBrushGray6}"
+              StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+              X1="0" X2="10000" Y1="8" Y2="8" Width="100" HorizontalAlignment="Right" />
+        <!-- 轨道已填充部分（蓝色，靠左对齐） -->
+        <Line x:Name="LineFore" Stroke="{DynamicResource ColorBrush3}"
+              StrokeThickness="6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+              X1="0" X2="10000" Y1="8" Y2="8" Width="0" HorizontalAlignment="Left" />
+        <!-- 滑块圆点 -->
+        <Ellipse x:Name="ShapeDot" Width="16" Height="16" Fill="{DynamicResource ColorBrush3}"
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">
+            <Ellipse.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1" />
+            </Ellipse.RenderTransform>
+        </Ellipse>
+    </Grid>
+</Border>

@@ -1,0 +1,27 @@
+## 编译产物
+bin/
+obj/
+
+## NuGet
+*.nupkg
+*.snupkg
+
+## Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.cache
+
+## 临时文件
+*.tmp
+*.bak
+*~
+
+## 旧备份
+*.old
+
+## 日志
+*.log
+ARCHITECTURE.md

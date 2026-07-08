@@ -1,0 +1,154 @@
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace NpcSkinMaker
+{
+    /// <summary>
+    /// 皮肤管理器 — 移植自 Python core/skin_manager.py
+    /// 增删改查逻辑 1:1 等价移植
+    /// </summary>
+    public class SkinManager
+    {
+        private readonly List<SkinData> _skins = new List<SkinData>();
+        private const int MaxSkins = 1000;
+
+        /// <summary>添加皮肤</summary>
+        public SkinData AddSkin(string texturePath, string name, string author)
+        {
+            // 验证 PNG 文件
+            string msg;
+            if (!Utils.ValidatePngFile(texturePath, out msg))
+                throw new Exception("皮肤验证失败: " + msg);
+
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception("人物名称不能为空");
+            if (string.IsNullOrWhiteSpace(author))
+                throw new Exception("作者名称不能为空");
+
+            if (_skins.Count >= MaxSkins)
+                throw new Exception("单次最多支持 " + MaxSkins + " 个皮肤");
+
+            string skinId = Utils.GenerateShortUid(prefix: "skin");
+
+            var skin = new SkinData
+            {
+                Id = skinId,
+                TexturePath = texturePath,
+                Name = name.Trim(),
+                Author = author.Trim()
+            };
+
+            _skins.Add(skin);
+            return skin;
+        }
+
+        /// <summary>更新皮肤信息</summary>
+        public void UpdateSkin(int index, string name, string author)
+        {
+            if (index < 0 || index >= _skins.Count)
+                throw new Exception("皮肤索引无效");
+
+            if (string.IsNullOrWhiteSpace(name))
+                throw new Exception("人物名称不能为空");
+            if (string.IsNullOrWhiteSpace(author))
+                throw new Exception("作者名称不能为空");
+
+            _skins[index].Name = name.Trim();
+            _skins[index].Author = author.Trim();
+        }
+
+        /// <summary>删除皮肤</summary>
+        public void RemoveSkin(int index)
+        {
+            if (index < 0 || index >= _skins.Count)
+                throw new Exception("皮肤索引无效");
+            _skins.RemoveAt(index);
+        }
+
+        public SkinData GetSkin(int index)
+        {
+            if (index < 0 || index >= _skins.Count)
+                throw new Exception("皮肤索引无效");
+            return _skins[index];
+        }
+
+        public List<SkinData> GetAllSkins() { return _skins; }
+
+        public void ClearSkins() { _skins.Clear(); }
+
+        public int GetSkinCount() { return _skins.Count; }
+
+        /// <summary>导出为字典格式（用于 JSON 序列化）</summary>
+        public Dictionary<string, object> ExportToDict(string packageName)
+        {
+            var npcskinlist = new List<Dictionary<string, object>>();
+            foreach (var skin in _skins)
+            {
+                var item = new Dictionary<string, object>();
+                item["ID"] = packageName + "_" + Utils.GenerateShortUid("", 6);
+                item["name"] = skin.Name;
+                item["by"] = skin.Author;
+                item["texture"] = "textures/entity/npc_dlcskin/" + skin.Id;
+                npcskinlist.Add(item);
+            }
+            var result = new Dictionary<string, object>();
+            result["npcskinlist"] = npcskinlist;
+            return result;
+        }
+
+        /// <summary>从字典导入皮肤列表（用于 JSON 反序列化）</summary>
+        public void ImportFromDict(Dictionary<string, object> data)
+        {
+            if (data == null || !data.ContainsKey("npcskinlist"))
+                throw new Exception("无效的皮肤数据格式");
+
+            var npcskinlist = data["npcskinlist"];
+            List<object> list = npcskinlist as List<object>;
+            if (list == null)
+                throw new Exception("皮肤列表格式无效");
+
+            if (list.Count > MaxSkins)
+                throw new Exception("皮肤数量超过限制（最多 " + MaxSkins + " 个）");
+
+            _skins.Clear();
+
+            foreach (var itemObj in list)
+            {
+                Dictionary<string, object> item = itemObj as Dictionary<string, object>;
+                if (item == null)
+                    throw new Exception("皮肤数据格式无效");
+
+                if (!item.ContainsKey("ID") || !item.ContainsKey("name") ||
+                    !item.ContainsKey("by") || !item.ContainsKey("texture"))
+                    throw new Exception("皮肤数据缺少必要字段");
+
+                string texturePath = item["texture"].ToString();
+                string textureFilename = texturePath.Contains("/")
+                    ? texturePath.Substring(texturePath.LastIndexOf('/') + 1)
+                    : texturePath;
+
+                // 移除可能存在的 .png 后缀
+                if (textureFilename.EndsWith(".png"))
+                    textureFilename = textureFilename.Substring(0, textureFilename.Length - 4);
+
+                // 原始 texture 路径（去掉 .png）
+                string originalTexture = item["texture"].ToString();
+                if (originalTexture.EndsWith(".png"))
+                    originalTexture = originalTexture.Substring(0, originalTexture.Length - 4);
+
+                var skin = new SkinData
+                {
+                    Id = textureFilename,
+                    OriginalId = item["ID"].ToString(),
+                    OriginalTexture = originalTexture,
+                    TexturePath = "",
+                    Name = item["name"].ToString(),
+                    Author = item["by"].ToString(),
+                    FromImport = true
+                };
+                _skins.Add(skin);
+            }
+        }
+    }
+}
