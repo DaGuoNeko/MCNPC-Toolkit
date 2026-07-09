@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -240,9 +241,11 @@ namespace NpcSkinMaker
             AddTitleNavButton(_settings.NavSettings, 3);
             AddTitleNavButton(_settings.NavAbout, 4);
 
-            // 左侧栏导航按钮（3D 文字 / 开发者工具箱）
+            // 左侧栏导航按钮（3D 文字 / 开发者工具箱 / MCStudio配置）
             AddSidebarNavButton(_settings.Nav3DText, MyIconButton.IconCreeper, 1);
             AddSidebarNavButton(_settings.NavDevTools, MyIconButton.IconSettings, 2);
+            AddSidebarNavButton("MCStudio项目配置管理", MyIconButton.IconSettings, 5);
+            AddSidebarNavButton("存档全局配置", MyIconButton.IconSettings, 6);
         }
 
         private void AddTitleNavButton(string title, int index)
@@ -330,6 +333,9 @@ namespace NpcSkinMaker
                 case 2: newPage = new PageMcTools(); break;
                 case 3: newPage = new PageSettings(); break;
                 case 4: newPage = new PageAbout(); break;
+                case 5: newPage = new PageMcStudioConfig(); break;
+                case 6: newPage = new PageSaveConfig(); break;
+                case 7: newPage = new PageTestSaves(); break;
             }
 
             if (newPage != null)
@@ -364,6 +370,9 @@ namespace NpcSkinMaker
                 ThemeManager.ApplySystemAccent();
             else
                 ThemeManager.Apply(_settings.ThemeHue, _settings.ThemeSat);
+
+            // 应用保存的字体
+            ApplySavedFont();
 
             // 入场动画：旋转+位移归位
             var rotateAni = new DoubleAnimation
@@ -482,6 +491,35 @@ namespace NpcSkinMaker
         {
             _settings.Save();
             base.OnClosed(e);
+        }
+
+        /// <summary>
+        /// 从设置加载字体并应用到全局资源
+        /// </summary>
+        private void ApplySavedFont()
+        {
+            string fontName = _settings.FontFamilyName;
+            if (string.IsNullOrEmpty(fontName))
+                return;
+
+            try
+            {
+                System.Windows.Media.FontFamily font;
+                if (System.IO.File.Exists(fontName))
+                {
+                    var families = System.Windows.Media.Fonts.GetFontFamilies(fontName);
+                    font = families.Count > 0 ? families.First() : new System.Windows.Media.FontFamily("Microsoft YaHei UI");
+                }
+                else
+                {
+                    font = new System.Windows.Media.FontFamily(fontName);
+                }
+                Application.Current.Resources["FontDefault"] = font;
+            }
+            catch
+            {
+                // 字体加载失败，保持默认
+            }
         }
     }
 

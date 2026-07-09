@@ -46,6 +46,10 @@ namespace NpcSkinMaker
         public bool ModWorldData { get; set; }
         public bool ModSetting { get; set; }
         public string ItemScriptPath { get; set; }    // 物品模板生成脚本路径
+        public string FontFamilyName { get; set; }    // 软件字体（系统字体名或文件路径）
+        public string FeverGamePath { get; set; }     // FeverGames 游戏安装路径
+        public string FeverPlayerId { get; set; }     // FeverGames 上次选中的玩家ID
+        public string FeverChannel { get; set; }      // FeverGames 端选择: PC=正式端, PE=测试端
 
         public AppSettings()
         {
@@ -76,6 +80,7 @@ namespace NpcSkinMaker
             ModWorldData = false;
             ModSetting = false;
             ItemScriptPath = "";
+            FontFamilyName = "Microsoft YaHei UI";
         }
 
         private static string SettingsPath
@@ -113,6 +118,10 @@ namespace NpcSkinMaker
                         settings.ModWorldData = user.ModWorldData;
                         settings.ModSetting = user.ModSetting;
                         if (!string.IsNullOrEmpty(user.ItemScriptPath)) settings.ItemScriptPath = user.ItemScriptPath;
+                        if (!string.IsNullOrEmpty(user.FontFamilyName)) settings.FontFamilyName = user.FontFamilyName;
+                        if (!string.IsNullOrEmpty(user.FeverGamePath)) settings.FeverGamePath = user.FeverGamePath;
+                        if (!string.IsNullOrEmpty(user.FeverPlayerId)) settings.FeverPlayerId = user.FeverPlayerId;
+                        if (!string.IsNullOrEmpty(user.FeverChannel)) settings.FeverChannel = user.FeverChannel;
                     }
                 }
             }
@@ -145,6 +154,10 @@ namespace NpcSkinMaker
                     ModWorldData = this.ModWorldData,
                     ModSetting = this.ModSetting,
                     ItemScriptPath = this.ItemScriptPath,
+                    FontFamilyName = this.FontFamilyName,
+                    FeverGamePath = this.FeverGamePath,
+                    FeverPlayerId = this.FeverPlayerId,
+                    FeverChannel = this.FeverChannel,
                 };
                 string json = JsonConvert.SerializeObject(save, Formatting.Indented);
                 File.WriteAllText(SettingsPath, json);

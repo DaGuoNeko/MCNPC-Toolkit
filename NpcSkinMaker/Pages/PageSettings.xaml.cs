@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Win32;
 
 namespace NpcSkinMaker
 {
@@ -10,6 +15,7 @@ namespace NpcSkinMaker
     public partial class PageSettings : UserControl
     {
         private bool _initializing = true;
+        private string _selectedFontName;
 
         public PageSettings()
         {
@@ -42,6 +48,9 @@ namespace NpcSkinMaker
             AddThemePreset("橙色", 30, 90);
             AddThemePreset("绿色", 140, 70);
             AddThemePreset("青色", 180, 70);
+
+            // 字体设置
+            InitFontSettings(settings);
 
             _initializing = false;
         }
@@ -151,5 +160,155 @@ namespace NpcSkinMaker
             MainWindow.Instance.Settings.Save();
             MainWindow.Instance.SetBackground(null);
         }
+
+        #region 字体设置
+
+        /// <summary>
+        /// 初始化字体下拉列表：系统字体 + 当前保存的字体
+        /// </summary>
+        private void InitFontSettings(AppSettings settings)
+        {
+            _selectedFontName = settings.FontFamilyName;
+
+            // 收集系统字体（按名称排序）
+            var systemFonts = new List<string>();
+            foreach (var family in Fonts.SystemFontFamilies)
+            {
+                string name = family.Source;
+                if (!systemFonts.Contains(name))
+                    systemFonts.Add(name);
+            }
+            systemFonts.Sort();
+
+            // 先加一个「自定义字体文件」占位项
+            CmbFont.Items.Add("（自定义字体文件）");
+
+            foreach (string name in systemFonts)
+                CmbFont.Items.Add(name);
+
+            // 选中当前字体
+            SelectCurrentFont(settings.FontFamilyName);
+
+            // 切换字体时立即应用
+            CmbFont.SelectionChanged += (_, _) =>
+            {
+                if (_initializing) return;
+                if (CmbFont.SelectedIndex <= 0) return; // 跳过占位项
+
+                string fontName = CmbFont.SelectedItem as string;
+                if (string.IsNullOrEmpty(fontName)) return;
+
+                _selectedFontName = fontName;
+                ApplyFontGlobally(fontName, false);
+                LabFontPreview.FontFamily = new FontFamily(fontName);
+
+                settings.FontFamilyName = fontName;
+                settings.Save();
+            };
+
+            // 选择字体文件按钮
+            BtnBrowseFont.Click += (_, _) =>
+            {
+                var ofd = new OpenFileDialog
+                {
+                    Title = "选择字体文件",
+                    Filter = "字体文件|*.ttf;*.otf;*.ttc|所有文件|*.*"
+                };
+                if (ofd.ShowDialog() == true)
+                {
+                    _selectedFontName = ofd.FileName;
+                    ApplyFontGlobally(ofd.FileName, true);
+                    LabFontPreview.FontFamily = LoadFontFromFile(ofd.FileName);
+
+                    // 取消系统字体选中
+                    CmbFont.SelectedIndex = 0;
+                    CmbFont.Text = Path.GetFileName(ofd.FileName);
+
+                    settings.FontFamilyName = ofd.FileName;
+                    settings.Save();
+                }
+            };
+
+            // 设置预览字体
+            LabFontPreview.FontFamily = GetCurrentFontFamily(settings.FontFamilyName);
+        }
+
+        /// <summary>
+        /// 在 ComboBox 中选中对应字体
+        /// </summary>
+        private void SelectCurrentFont(string fontName)
+        {
+            if (string.IsNullOrEmpty(fontName))
+            {
+                CmbFont.SelectedIndex = 0;
+                return;
+            }
+
+            // 检查是否是文件路径
+            if (File.Exists(fontName))
+            {
+                CmbFont.SelectedIndex = 0;
+                CmbFont.Text = "(自定义) " + Path.GetFileName(fontName);
+                return;
+            }
+
+            // 在列表中查找
+            for (int i = 1; i < CmbFont.Items.Count; i++)
+            {
+                if (string.Equals(CmbFont.Items[i] as string, fontName, StringComparison.OrdinalIgnoreCase))
+                {
+                    CmbFont.SelectedIndex = i;
+                    return;
+                }
+            }
+
+            CmbFont.SelectedIndex = 0;
+            CmbFont.Text = fontName;
+        }
+
+        /// <summary>
+        /// 获取当前字体 FontFamily 对象
+        /// </summary>
+        private FontFamily GetCurrentFontFamily(string fontName)
+        {
+            if (string.IsNullOrEmpty(fontName))
+                return new FontFamily("Microsoft YaHei UI");
+
+            if (File.Exists(fontName))
+                return LoadFontFromFile(fontName);
+
+            return new FontFamily(fontName);
+        }
+
+        /// <summary>
+        /// 从字体文件加载 FontFamily
+        /// </summary>
+        private static FontFamily LoadFontFromFile(string filePath)
+        {
+            try
+            {
+                var families = Fonts.GetFontFamilies(filePath);
+                if (families != null && families.Count > 0)
+                    return families.First();
+            }
+            catch { }
+            return new FontFamily("Microsoft YaHei UI");
+        }
+
+        /// <summary>
+        /// 全局应用字体到所有控件
+        /// </summary>
+        private static void ApplyFontGlobally(string fontName, bool isFile)
+        {
+            FontFamily font;
+            if (isFile)
+                font = LoadFontFromFile(fontName);
+            else
+                font = new FontFamily(fontName);
+
+            Application.Current.Resources["FontDefault"] = font;
+        }
+
+        #endregion
     }
 }
