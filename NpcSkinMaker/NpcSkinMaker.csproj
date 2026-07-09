@@ -23,7 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
     <!-- PolySharp：源生成器，在 net48 上提供 C# 最新语法特性支持 -->
     <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -47,9 +47,9 @@
     <Resource Include="Resources\icon.ico" />
   </ItemGroup>
 
-  <!-- WebView2 原生 DLL：嵌入资源，启动时提取到 LocalAppData -->
+  <!-- WebView2 原生 DLL：嵌入资源，启动时提取到 EXE 同目录 -->
   <ItemGroup>
-    <EmbeddedResource Include="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll">
+    <EmbeddedResource Include="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.2903.40\runtimes\win-x64\native\WebView2Loader.dll">
       <LogicalName>WebView2Loader.dll</LogicalName>
     </EmbeddedResource>
   </ItemGroup>

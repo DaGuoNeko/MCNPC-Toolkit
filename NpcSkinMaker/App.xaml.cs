@@ -9,10 +9,7 @@ namespace NpcSkinMaker
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            // 必须最先执行：提取 WebView2Loader.dll 到 EXE 同目录
-            // （WebView2 在类型加载时就尝试加载原生 DLL，比 MainWindow 构造更早）
             ExtractWebView2Loader();
-
             base.OnStartup(e);
             Logger.Info("应用启动");
         }
@@ -27,17 +24,18 @@ namespace NpcSkinMaker
 
                 using (var stream = assembly.GetManifestResourceStream("WebView2Loader.dll"))
                 {
-                    if (stream != null)
+                    if (stream == null) return;
+
+                    if (!File.Exists(dllPath) || stream.Length != new FileInfo(dllPath).Length)
                     {
-                        if (!File.Exists(dllPath) || stream.Length != new FileInfo(dllPath).Length)
-                        {
-                            using (var fs = new FileStream(dllPath, FileMode.Create))
-                            {
-                                stream.CopyTo(fs);
-                            }
-                        }
+                        using (var fs = new FileStream(dllPath, FileMode.Create))
+                            stream.CopyTo(fs);
                     }
                 }
+
+                // 新版 SDK 支持：告知 WebView2 从 EXE 目录加载
+                if (File.Exists(dllPath))
+                    Microsoft.Web.WebView2.Core.CoreWebView2Environment.SetLoaderDllFolderPath(exeDir);
             }
             catch { }
         }
