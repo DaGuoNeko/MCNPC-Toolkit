@@ -99,46 +99,11 @@ namespace NpcSkinMaker
             InitializeTemplate();
             InitializeModelTemplate();
 
-            // 提取嵌入的 WebView2Loader.dll（单 EXE 运行必需）
-            ExtractWebView2Loader();
-
             // 初始化功能切换栏（左侧模式按钮）
             InitializeModeButtons();
 
             // 初始化导航
             InitializeNavigation();
-        }
-
-        /// <summary>
-        /// 提取嵌入的 WebView2Loader.dll 到 EXE 同目录（单文件运行必需）
-        /// </summary>
-        private void ExtractWebView2Loader()
-        {
-            try
-            {
-                string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-                string dllPath = Path.Combine(exeDir, "WebView2Loader.dll");
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-
-                using (var stream = assembly.GetManifestResourceStream("WebView2Loader.dll"))
-                {
-                    if (stream != null)
-                    {
-                        if (!File.Exists(dllPath) || stream.Length != new FileInfo(dllPath).Length)
-                        {
-                            using (var fs = new FileStream(dllPath, FileMode.Create))
-                            {
-                                stream.CopyTo(fs);
-                            }
-                            Logger.Info("已提取 WebView2Loader.dll 到: " + dllPath);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("提取 WebView2Loader.dll 失败: " + ex.Message);
-            }
         }
 
         private void InitializeTemplate()
