@@ -58,6 +58,7 @@ namespace NpcSkinMaker
             Instance = this;
 
             _settings = AppSettings.Load();
+            Title = _settings.WindowTitle;
 
             Loaded += MainWindow_Loaded;
 
@@ -190,8 +191,8 @@ namespace NpcSkinMaker
 
         private void InitializeTopTabs()
         {
-            AddTabButton("皮肤拓展制作", 0);
-            AddTabButton("模型拓展制作", 1);
+            AddTabButton(_settings.TabSkin, 0);
+            AddTabButton(_settings.TabModel, 1);
         }
 
         private void AddTabButton(string title, int index)
@@ -228,11 +229,11 @@ namespace NpcSkinMaker
 
         private void InitializeNavigation()
         {
-            AddNavButton("首页", MyIconButton.IconHome, 0);
-            AddNavButton("3D 文字", MyIconButton.IconCreeper, 1);
-            AddNavButton("开发者工具箱", MyIconButton.IconSettings, 2);
-            AddNavButton("设置", MyIconButton.IconSettings, 3);
-            AddNavButton("关于", MyIconButton.IconInfo, 4);
+            AddNavButton(_settings.NavHome, MyIconButton.IconHome, 0);
+            AddNavButton(_settings.Nav3DText, MyIconButton.IconCreeper, 1);
+            AddNavButton(_settings.NavDevTools, MyIconButton.IconSettings, 2);
+            AddNavButton(_settings.NavSettings, MyIconButton.IconSettings, 3);
+            AddNavButton(_settings.NavAbout, MyIconButton.IconInfo, 4);
         }
 
         private void AddNavButton(string title, string icon, int index)
@@ -318,6 +319,7 @@ namespace NpcSkinMaker
             LoadBackground();
 
             // 应用主题
+            LabTitle.Text = _settings.WindowTitle;
             if (_settings.UseSystemAccent)
                 ThemeManager.ApplySystemAccent();
             else

@@ -5,14 +5,19 @@ using System.Windows.Navigation;
 
 namespace NpcSkinMaker
 {
-    /// <summary>
-    /// 关于页
-    /// </summary>
+    /// <summary>关于页</summary>
     public partial class PageAbout : UserControl
     {
         public PageAbout()
         {
             InitializeComponent();
+
+            var s = MainWindow.Instance.Settings;
+            LabVersion.Text = "版本 " + s.Version;
+            LabAuthor.Text = "作者: " + s.Author;
+
+            LinkPCL.NavigateUri = new System.Uri(s.PclRepoUrl);
+            LinkRepo.NavigateUri = new System.Uri(s.RepoUrl);
 
             LinkPCL.RequestNavigate += OpenUrl;
             LinkRepo.RequestNavigate += OpenUrl;

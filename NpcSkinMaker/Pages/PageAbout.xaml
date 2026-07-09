@@ -30,14 +30,14 @@
                             PCL2 (Plain Craft Launcher 2)
                         </Hyperlink>
                     </TextBlock>
-                    <TextBlock Text="版本 2.0.0" FontSize="13"
+                    <TextBlock x:Name="LabVersion" FontSize="13"
                                Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,12" />
 
                     <TextBlock Text="一款用于为网易中国版 Minecraft 基岩版制作 NPC DLC 拓展包的桌面工具箱，支持皮肤拓展和模型拓展两种模式。"
                                FontSize="13" Foreground="{DynamicResource ColorBrushGray2}"
                                TextWrapping="Wrap" Margin="0,0,0,8" />
 
-                    <TextBlock Text="作者: 大果喵 (DaGuoNeko)" FontSize="13"
+                    <TextBlock x:Name="LabAuthor" FontSize="13"
                                Foreground="{DynamicResource ColorBrushGray2}" Margin="0,0,0,4" />
                     <TextBlock FontSize="13" Margin="0,0,0,4">
                         <Run Text="源代码: " Foreground="{DynamicResource ColorBrushGray2}" />

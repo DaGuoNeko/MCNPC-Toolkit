@@ -92,7 +92,6 @@ namespace NpcSkinMaker
 
             dialog.WindowStartupLocation = WindowStartupLocation.Manual;
 
-            // 用 BorderForm 的实际屏幕位置和大小（不含透明边距和缩放手柄）
             var borderForm = main.BorderFormEl;
             var topLeft = borderForm.PointToScreen(new Point(0, 0));
             dialog.Left = topLeft.X;

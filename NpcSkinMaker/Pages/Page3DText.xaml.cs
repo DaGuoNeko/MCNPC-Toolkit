@@ -27,7 +27,7 @@ namespace NpcSkinMaker
                     LabLoading.Visibility = Visibility.Collapsed;
                 };
 
-                WebView.CoreWebView2.Navigate("https://3dtext.easecation.net/");
+                WebView.CoreWebView2.Navigate(MainWindow.Instance.Settings.Cube3DUrl);
             }
             catch (Exception ex)
             {

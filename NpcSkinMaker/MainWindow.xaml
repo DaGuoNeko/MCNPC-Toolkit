@@ -62,7 +62,7 @@
                         <!-- Logo + 标题 -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                             <local:LogoIcon Width="20" Height="24" VerticalAlignment="Center" Margin="0,0,10,0" />
-                            <TextBlock Text="MCNPC 拓展制作工具箱" Foreground="White" FontSize="15" FontWeight="Bold"
+                            <TextBlock x:Name="LabTitle" Text="MCNPC 拓展制作工具箱" Foreground="White" FontSize="15" FontWeight="Bold"
                                        VerticalAlignment="Center" FontFamily="{DynamicResource FontDefault}" />
                         </StackPanel>
 
