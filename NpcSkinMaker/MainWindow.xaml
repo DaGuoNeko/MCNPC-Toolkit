@@ -66,8 +66,8 @@
                                        VerticalAlignment="Center" FontFamily="{DynamicResource FontDefault}" />
                         </StackPanel>
 
-                        <!-- 功能切换栏（嵌在标题栏中间） -->
-                        <StackPanel x:Name="PanTopTabs" Grid.Column="1" Orientation="Horizontal"
+                        <!-- 标题栏导航按钮（嵌在标题栏中间） -->
+                        <StackPanel x:Name="PanTitleNav" Grid.Column="1" Orientation="Horizontal"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                         <!-- 标题栏按钮 -->
@@ -96,7 +96,14 @@
                             <Border x:Name="NavIndicator" Width="3" Background="{DynamicResource ColorBrush3}"
                                     CornerRadius="1.5" HorizontalAlignment="Left" VerticalAlignment="Top"
                                     Margin="5,12,0,0" Height="28" />
-                            <StackPanel x:Name="PanLeftItems" Margin="8,12,8,12" />
+                            <StackPanel Margin="8,12,8,12">
+                                <!-- 模式切换按钮（皮肤/模型） -->
+                                <StackPanel x:Name="PanLeftModes" />
+                                <!-- 分隔线 -->
+                                <Rectangle Height="1" Fill="{DynamicResource ColorBrushGray5}" Margin="0,6,0,8" />
+                                <!-- 导航按钮 -->
+                                <StackPanel x:Name="PanLeftItems" />
+                            </StackPanel>
                         </Grid>
                     </Border>
 

@@ -22,9 +22,16 @@ namespace NpcSkinMaker
         public Border PanTitleEl { get { return PanTitle; } }
         public Border BorderFormEl { get { return BorderForm; } }
 
-        private readonly List<NavButton> _navButtons = new List<NavButton>();
+        // 自定义 SVG 图标：人物剪影（皮肤拓展）
+        public static readonly string IconSkin = "F1 M7,0 C5.34,0 4,1.34 4,3 C4,4.66 5.34,6 7,6 C8.66,6 10,4.66 10,3 C10,1.34 8.66,0 7,0 Z M2,8 L2,15 12,15 12,8 C9.5,6.5 4.5,6.5 2,8 Z";
+        // 自定义 SVG 图标：方块轮廓（模型拓展）
+        public static readonly string IconModel = "F1 M9,0 L17,4 L17,12 L9,16 L1,12 L1,4 Z M9,0 L9,16 M1,4 L9,12 L17,4";
+
+        private readonly List<NavButton> _modeButtons = new List<NavButton>();
+        private readonly List<TitleBarNavButton> _titleNavButtons = new List<TitleBarNavButton>();
+        private readonly List<NavButton> _sidebarNavButtons = new List<NavButton>();
         private int _currentPageIndex = -1;
-        private int _currentTool = 0;
+        private int _currentTool = 0; // 0=皮肤, 1=模型
         private bool _isTransitioning = false; // 防止快速点击导致的动画叠加
 
         // 页面缓存（避免每次切换都重新创建）
@@ -33,9 +40,7 @@ namespace NpcSkinMaker
         private PageMcTools _pageMcTools;
         private Page3DText _page3DText;
         private PageSettings _pageSettings;
-        private PageAbout _pageAbout; // 0=皮肤, 1=模型
-
-        private readonly List<TabButton> _tabButtons = new List<TabButton>();
+        private PageAbout _pageAbout;
 
         private readonly SkinManager _skinManager = new SkinManager();
         private readonly ModelManager _modelManager = new ModelManager();
@@ -93,8 +98,8 @@ namespace NpcSkinMaker
             InitializeTemplate();
             InitializeModelTemplate();
 
-            // 初始化功能切换栏
-            InitializeTopTabs();
+            // 初始化功能切换栏（左侧模式按钮）
+            InitializeModeButtons();
 
             // 初始化导航
             InitializeNavigation();
@@ -189,16 +194,27 @@ namespace NpcSkinMaker
             }
         }
 
-        private void AddTabButton(string title, int index)
+        /// <summary>
+        /// 初始化左侧栏模式切换按钮（皮肤拓展制作 / 模型拓展制作）
+        /// </summary>
+        private void InitializeModeButtons()
         {
-            var btn = new TabButton
+            AddModeButton(_settings.TabSkin, IconSkin, 0);
+            AddModeButton(_settings.TabModel, IconModel, 1);
+        }
+
+        private void AddModeButton(string title, string icon, int tool)
+        {
+            var btn = new NavButton
             {
                 Title = title,
-                Index = index
+                IconData = icon,
+                Index = tool
             };
             btn.Selected += (i) => SwitchTool(i);
-            _tabButtons.Add(btn);
-            PanTopTabs.Children.Add(btn);
+            btn.IsSelected = tool == 0; // 默认选中皮肤
+            _modeButtons.Add(btn);
+            PanLeftModes.Children.Add(btn);
         }
 
         private void SwitchTool(int tool)
@@ -210,7 +226,7 @@ namespace NpcSkinMaker
             _pageHome = null;
             _pageModelHome = null;
 
-            foreach (var btn in _tabButtons)
+            foreach (var btn in _modeButtons)
                 btn.IsSelected = btn.Index == tool;
 
             _currentPageIndex = -1;
@@ -219,20 +235,29 @@ namespace NpcSkinMaker
 
         private void InitializeNavigation()
         {
-            AddNavButton(_settings.NavHome, MyIconButton.IconHome, 0);
-            AddNavButton(_settings.Nav3DText, MyIconButton.IconCreeper, 1);
-            AddNavButton(_settings.NavDevTools, MyIconButton.IconSettings, 2);
-            AddNavButton(_settings.NavSettings, MyIconButton.IconSettings, 3);
-            AddNavButton(_settings.NavAbout, MyIconButton.IconInfo, 4);
+            // 标题栏导航按钮（首页 / 设置 / 关于）
+            AddTitleNavButton(_settings.NavHome, 0);
+            AddTitleNavButton(_settings.NavSettings, 3);
+            AddTitleNavButton(_settings.NavAbout, 4);
+
+            // 左侧栏导航按钮（3D 文字 / 开发者工具箱）
+            AddSidebarNavButton(_settings.Nav3DText, MyIconButton.IconCreeper, 1);
+            AddSidebarNavButton(_settings.NavDevTools, MyIconButton.IconSettings, 2);
         }
 
-        private void InitializeTopTabs()
+        private void AddTitleNavButton(string title, int index)
         {
-            AddTabButton(_settings.TabSkin, 0);
-            AddTabButton(_settings.TabModel, 1);
+            var btn = new TitleBarNavButton
+            {
+                Title = title,
+                Index = index
+            };
+            btn.Selected += (i) => NavigateToPage(i);
+            _titleNavButtons.Add(btn);
+            PanTitleNav.Children.Add(btn);
         }
 
-        private void AddNavButton(string title, string icon, int index)
+        private void AddSidebarNavButton(string title, string icon, int index)
         {
             var btn = new NavButton
             {
@@ -242,7 +267,7 @@ namespace NpcSkinMaker
             };
             btn.Margin = new Thickness(0, 0, 0, 6);
             btn.Selected += (i) => NavigateToPage(i);
-            _navButtons.Add(btn);
+            _sidebarNavButtons.Add(btn);
             PanLeftItems.Children.Add(btn);
         }
 
@@ -250,22 +275,46 @@ namespace NpcSkinMaker
         {
             if (index == _currentPageIndex) return;
 
-            foreach (var btn in _navButtons)
+            // 更新标题栏按钮选中态
+            foreach (var btn in _titleNavButtons)
                 btn.IsSelected = btn.Index == index;
 
-            // 滑动指示条动画
-            if (index >= 0 && index < _navButtons.Count)
+            // 更新侧栏导航按钮选中态
+            foreach (var btn in _sidebarNavButtons)
+                btn.IsSelected = btn.Index == index;
+
+            // 滑动指示条动画 — 跟踪侧栏所有按钮（模式按钮 + 导航按钮）
+            FrameworkElement indicatorTarget = null;
+
+            // 优先匹配侧栏导航按钮（3D文字 / 开发者工具箱）
+            var sidebarBtn = _sidebarNavButtons.Find(b => b.Index == index);
+            if (sidebarBtn != null)
+                indicatorTarget = sidebarBtn;
+
+            // 首页 (index=0) 没有侧栏导航按钮，则跟踪当前激活的模式按钮（皮肤 / 模型）
+            if (indicatorTarget == null && index == 0)
             {
-                var targetBtn = _navButtons[index];
-                // 计算目标位置：按钮在 PanLeftItems 中的实际位置
-                targetBtn.UpdateLayout();
-                var transform = targetBtn.TransformToAncestor(PanMainLeft);
+                var modeBtn = _modeButtons.Find(b => b.Index == _currentTool);
+                if (modeBtn != null)
+                    indicatorTarget = modeBtn;
+            }
+
+            if (indicatorTarget != null)
+            {
+                NavIndicator.Opacity = 1;
+                indicatorTarget.UpdateLayout();
+                var transform = indicatorTarget.TransformToAncestor(PanMainLeft);
                 var pos = transform.Transform(new System.Windows.Point(0, 0));
                 double targetY = pos.Y;
-                double targetH = targetBtn.ActualHeight;
+                double targetH = indicatorTarget.ActualHeight;
 
                 AniHelper.AniThickness(NavIndicator,
                     new Thickness(5, targetY + (targetH - 28) / 2, 0, 0), 100, 0);
+            }
+            else
+            {
+                // 当前页面不在侧栏中（标题栏页面），隐藏指示条
+                NavIndicator.Opacity = 0;
             }
 
             FrameworkElement newPage = null;
@@ -341,21 +390,15 @@ namespace NpcSkinMaker
                 AniHelper.ControlEnabled--;
 
                 // 默认选中第一个 Tab
-                foreach (var tab in _tabButtons)
-                    tab.IsSelected = tab.Index == _currentTool;
+                foreach (var btn in _modeButtons)
+                    btn.IsSelected = btn.Index == _currentTool;
 
-                // 左侧导航栏滑出动画（仿 PCL MyPageLeft）
-                AniHelper.LeftPanelEnterAnimation(PanLeftItems.Children, baseDelay: 200);
+                // 左侧栏滑出动画（仿 PCL MyPageLeft）：模式按钮 + 导航按钮分别动画
+                AniHelper.LeftPanelEnterAnimation(PanLeftModes.Children, baseDelay: 200);
+                AniHelper.LeftPanelEnterAnimation(PanLeftItems.Children, baseDelay: 300);
 
-                // 首次定位指示条（无动画）
-                if (_navButtons.Count > 0)
-                {
-                    var btn = _navButtons[0];
-                    btn.UpdateLayout();
-                    var transform = btn.TransformToAncestor(PanMainLeft);
-                    var pos = transform.Transform(new System.Windows.Point(0, 0));
-                    NavIndicator.Margin = new Thickness(5, pos.Y + (btn.ActualHeight - 28) / 2, 0, 0);
-                }
+                // 首页在标题栏，侧栏无对应按钮，初始隐藏指示条
+                NavIndicator.Opacity = 0;
             }), DispatcherPriority.Render);
         }
 
@@ -535,9 +578,9 @@ namespace NpcSkinMaker
     }
 
     /// <summary>
-    /// 功能切换按钮 - 顶部 Tab 栏
+    /// 标题栏导航按钮 — 暗色主题，用于标题栏中的页面导航
     /// </summary>
-    public class TabButton : Border
+    public class TitleBarNavButton : Border
     {
         public string Title { get; set; }
         public int Index { get; set; }
@@ -553,7 +596,7 @@ namespace NpcSkinMaker
         private bool _isHover;
         private TextBlock _label;
 
-        public TabButton()
+        public TitleBarNavButton()
         {
             Padding = new Thickness(16, 6, 16, 6);
             Cursor = Cursors.Hand;
@@ -570,7 +613,7 @@ namespace NpcSkinMaker
             MouseLeave += (s, e) => { _isHover = false; Refresh(); };
             // 阻止 MouseLeftButtonDown 冒泡到 PanTitle 的 DragMove
             MouseLeftButtonDown += (s, e) => { e.Handled = true; };
-            MouseLeftButtonUp += delegate(object s, MouseButtonEventArgs e)
+            MouseLeftButtonUp += delegate (object s, MouseButtonEventArgs e)
             {
                 if (Selected != null)
                     Selected(Index);
