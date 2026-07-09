@@ -99,11 +99,59 @@ namespace NpcSkinMaker
             InitializeTemplate();
             InitializeModelTemplate();
 
+            // 提取嵌入的 WebView2Loader.dll（单 EXE 运行必需）
+            ExtractWebView2Loader();
+
             // 初始化功能切换栏（左侧模式按钮）
             InitializeModeButtons();
 
             // 初始化导航
             InitializeNavigation();
+        }
+
+        /// <summary>
+        /// 提取嵌入的 WebView2Loader.dll 到 LocalAppData，
+        /// 并设置 CoreWebView2Environment 加载路径（单 EXE 运行必需）
+        /// </summary>
+        private void ExtractWebView2Loader()
+        {
+            try
+            {
+                string extractDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "NPC_SkinMaker");
+                if (!Directory.Exists(extractDir))
+                    Directory.CreateDirectory(extractDir);
+
+                string dllPath = Path.Combine(extractDir, "WebView2Loader.dll");
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+                using (var stream = assembly.GetManifestResourceStream("WebView2Loader.dll"))
+                {
+                    if (stream != null)
+                    {
+                        // 仅在不存在或版本不同时覆盖
+                        if (!File.Exists(dllPath) || stream.Length != new FileInfo(dllPath).Length)
+                        {
+                            using (var fs = new FileStream(dllPath, FileMode.Create))
+                            {
+                                stream.CopyTo(fs);
+                            }
+                            Logger.Info("已提取 WebView2Loader.dll 到: " + dllPath);
+                        }
+                    }
+                }
+
+                // 告知 WebView2 从该目录加载原生 DLL
+                if (File.Exists(dllPath))
+                {
+                    Microsoft.Web.WebView2.Core.CoreWebView2Environment.SetLoaderDllFolderPath(extractDir);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("提取 WebView2Loader.dll 失败: " + ex.Message);
+            }
         }
 
         private void InitializeTemplate()
