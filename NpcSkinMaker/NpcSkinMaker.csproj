@@ -54,10 +54,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <!-- 构建后强制覆盖为 x64（防止 NuGet 自动复制 x86 版本） -->
-  <Target Name="ForceX64WebView2" AfterTargets="AfterBuild">
-    <Copy SourceFiles="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll"
-          DestinationFiles="$(OutputPath)WebView2Loader.dll" />
-  </Target>
-
 </Project>
