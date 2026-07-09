@@ -47,10 +47,10 @@
     <Resource Include="Resources\icon.ico" />
   </ItemGroup>
 
-  <!-- WebView2 原生 DLL（Costura 嵌入，不复制到输出） -->
+  <!-- WebView2 原生 DLL（随 EXE 分发，Costura 无法可靠嵌入原生 DLL） -->
   <ItemGroup>
     <Content Include="C:\Users\cat\.nuget\packages\microsoft.web.webview2\1.0.4078.44\runtimes\win-x64\native\WebView2Loader.dll"
-             CopyToOutputDirectory="Never"
+             CopyToOutputDirectory="PreserveNewest"
              Link="WebView2Loader.dll" />
   </ItemGroup>
 
