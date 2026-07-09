@@ -189,12 +189,6 @@ namespace NpcSkinMaker
             }
         }
 
-        private void InitializeTopTabs()
-        {
-            AddTabButton(_settings.TabSkin, 0);
-            AddTabButton(_settings.TabModel, 1);
-        }
-
         private void AddTabButton(string title, int index)
         {
             var btn = new TabButton
@@ -213,16 +207,12 @@ namespace NpcSkinMaker
 
             _currentTool = tool;
 
-            // 切工具时清掉首页缓存
             _pageHome = null;
             _pageModelHome = null;
-            _pageMcTools = null;
 
-            // 更新 Tab 选中状态
             foreach (var btn in _tabButtons)
                 btn.IsSelected = btn.Index == tool;
 
-            // 强制重新加载当前页面
             _currentPageIndex = -1;
             NavigateToPage(0);
         }
@@ -234,6 +224,12 @@ namespace NpcSkinMaker
             AddNavButton(_settings.NavDevTools, MyIconButton.IconSettings, 2);
             AddNavButton(_settings.NavSettings, MyIconButton.IconSettings, 3);
             AddNavButton(_settings.NavAbout, MyIconButton.IconInfo, 4);
+        }
+
+        private void InitializeTopTabs()
+        {
+            AddTabButton(_settings.TabSkin, 0);
+            AddTabButton(_settings.TabModel, 1);
         }
 
         private void AddNavButton(string title, string icon, int index)
@@ -282,10 +278,7 @@ namespace NpcSkinMaker
                     if (_page3DText == null) _page3DText = new Page3DText();
                     newPage = _page3DText;
                     break;
-                case 2:
-                    if (_pageMcTools == null) _pageMcTools = new PageMcTools();
-                    newPage = _pageMcTools;
-                    break;
+                case 2: newPage = new PageMcTools(); break;
                 case 3: newPage = new PageSettings(); break;
                 case 4: newPage = new PageAbout(); break;
             }
@@ -295,15 +288,13 @@ namespace NpcSkinMaker
                 PanRightContent.Children.Clear();
                 PanRightContent.Children.Add(newPage);
 
-                // 页面加载完成后播入场动画
-                RoutedEventHandler onLoaded = null;
-                onLoaded = (s, e) =>
+                // 直接播动画
+                newPage.Opacity = 1;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    newPage.Loaded -= onLoaded;
                     try { AniHelper.PageEnterAnimation(newPage); }
                     catch (Exception ex) { Logger.Error("页面动画异常: " + ex.Message); }
-                };
-                newPage.Loaded += onLoaded;
+                }), DispatcherPriority.Render);
             }
 
             _currentPageIndex = index;

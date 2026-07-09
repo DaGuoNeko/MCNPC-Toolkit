@@ -45,8 +45,7 @@
                 <!-- 按钮区 -->
                 <StackPanel x:Name="PanButtons" Grid.Row="2" Orientation="Horizontal"
                             HorizontalAlignment="Right" Margin="22,0,22,16">
-                </StackPanel>
-            </Grid>
+                </StackPanel>            </Grid>
         </Border>
     </Grid>
 </Window>

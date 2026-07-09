@@ -206,7 +206,7 @@ namespace NpcSkinMaker
             _rotate.BeginAnimation(RotateTransform.AngleProperty, aniRot);
         }
 
-        private void CloseWithAnimation()
+        public void CloseWithAnimation()
         {
             // 旋转 -> +6°，150ms
             var aniRot = new DoubleAnimation
@@ -243,6 +243,39 @@ namespace NpcSkinMaker
                 Duration = TimeSpan.FromMilliseconds(200)
             };
             Backdrop.BeginAnimation(OpacityProperty, aniBackdrop);
+        }
+
+        /// <summary>输入对话框（和 MyMsgBox 同一遮罩风格）</summary>
+        public static string Prompt(string label, string defaultValue = "")
+        {
+            var box = new MyMsgBox(label, label, MsgType.Info, false);
+            box.SyncWithMainWindow();
+            box.Owner = MainWindow.Instance;
+
+            // 替换消息内容区为输入框
+            box.LabMessage.Visibility = Visibility.Collapsed;
+            var tb = new MyTextBox { Hint = defaultValue, Text = defaultValue, Margin = new Thickness(0, 4, 0, 0) };
+            var contentPanel = box.FindName("LabMessage") as FrameworkElement;
+            var parent = contentPanel?.Parent as StackPanel;
+            if (parent != null)
+            {
+                int idx = parent.Children.IndexOf(contentPanel);
+                parent.Children.Insert(idx + 1, tb);
+            }
+
+            // 替换按钮为 确定/取消
+            box.PanButtons.Children.Clear();
+            string result = null;
+            var btnOk = new MyButton { Text = "确定", ColorType = MyButton.ColorState.Highlight, Margin = new Thickness(0, 0, 12, 0), Padding = new Thickness(20, 6, 20, 6) };
+            btnOk.Click += (s, e) => { result = tb.GetText(); box.CloseWithAnimation(); };
+            var btnCancel = new MyButton { Text = "取消", Padding = new Thickness(20, 6, 20, 6) };
+            btnCancel.Click += (s, e) => { box.CloseWithAnimation(); };
+            box.PanButtons.Children.Add(btnCancel);
+            box.PanButtons.Children.Add(btnOk);
+            tb.InnerBox.KeyDown += (s, e) => { if (e.Key == Key.Enter) { result = tb.GetText(); box.CloseWithAnimation(); } };
+
+            box.ShowDialog();
+            return result ?? defaultValue;
         }
     }
 }

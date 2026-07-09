@@ -77,6 +77,93 @@
                 </StackPanel>
             </Border>
 
+            <!-- 批量生成物品模板 -->
+            <Border CornerRadius="7" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1"
+                    BorderBrush="{DynamicResource ColorBrushGray5}" Padding="16,12" Margin="0,0,0,12">
+                <Border.Effect>
+                    <DropShadowEffect Color="{DynamicResource ColorObject4}" BlurRadius="10"
+                                      ShadowDepth="0" Opacity="0.08" Direction="270" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="批量生成 Minecraft 物品模板" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource ColorBrush1}" Margin="0,0,0,8" />
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="脚本路径:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemScript" Grid.Column="1" Hint="选择 autoMinecraftitem.py..." VerticalAlignment="Center" Margin="8,0" />
+                        <local:MyButton x:Name="BtnBrowseItemScript" Grid.Column="2" Text="浏览" VerticalAlignment="Center" Padding="13,4" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="命名空间:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemNs" Grid.Column="1" Hint="如 my_mod" VerticalAlignment="Center" Margin="8,0" />
+                        <TextBlock Grid.Column="2" Text="前缀名字:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemName" Grid.Column="3" Hint="如 sword" VerticalAlignment="Center" Margin="8,0" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="中文名前缀:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemCnName" Grid.Column="1" Hint="如 钻石剑" VerticalAlignment="Center" Margin="8,0" />
+                        <TextBlock Grid.Column="2" Text="创造栏:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemTab" Grid.Column="3" Hint="Items" VerticalAlignment="Center" Margin="8,0" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="起始序号:" VerticalAlignment="Center" FontSize="13" />
+                        <local:MyTextBox x:Name="TxtItemStart" Grid.Column="1" Hint="0" VerticalAlignment="Center" Margin="8,0" />
+                        <TextBlock Grid.Column="2" Text="→" VerticalAlignment="Center" FontSize="13" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Text="结束序号:" VerticalAlignment="Center" FontSize="13" Margin="8,0,0,0" />
+                        <local:MyTextBox x:Name="TxtItemEnd" Grid.Column="4" Hint="10" VerticalAlignment="Center" Margin="8,0" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="物品类型:" VerticalAlignment="Center" FontSize="13" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton x:Name="RbNormal" Content="普通物品" Margin="0,0,16,0" FontSize="13" IsChecked="True" />
+                            <RadioButton x:Name="RbWeapon" Content="武器" Margin="0,0,16,0" FontSize="13" />
+                            <RadioButton x:Name="RbPickaxe" Content="镐子" Margin="0,0,16,0" FontSize="13" />
+                        </StackPanel>
+                    </Grid>
+
+                    <WrapPanel Margin="0,0,0,8">
+                        <CheckBox x:Name="ChkItemIndex" Content="中文名带序号" FontSize="13" Margin="0,0,16,4" />
+                        <CheckBox x:Name="ChkItemCustom" Content="自定义物品类型" FontSize="13" Margin="0,0,16,4" />
+                    </WrapPanel>
+
+                    <local:MyButton x:Name="BtnGenItem" Text="生成物品模板" ColorType="Highlight"
+                                    HorizontalAlignment="Left" Padding="24,6" />
+                </StackPanel>
+            </Border>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

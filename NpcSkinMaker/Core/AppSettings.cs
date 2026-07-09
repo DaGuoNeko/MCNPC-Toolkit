@@ -39,7 +39,13 @@ namespace NpcSkinMaker
         public string BgImagePath { get; set; }
         public string McPath { get; set; }
         public string ModScriptPath { get; set; }    // MOD 生成脚本路径
-        public string ModOutDir { get; set; }         // MOD 输出目录           // MC 启动路径
+        public string ModOutDir { get; set; }         // MOD 输出目录
+        public string ModName { get; set; }           // 模组名称（保持输入不丢失）
+        public bool ModHelp { get; set; }
+        public bool ModHud { get; set; }
+        public bool ModWorldData { get; set; }
+        public bool ModSetting { get; set; }
+        public string ItemScriptPath { get; set; }    // 物品模板生成脚本路径
 
         public AppSettings()
         {
@@ -64,6 +70,12 @@ namespace NpcSkinMaker
             McPath = "";
             ModScriptPath = "";
             ModOutDir = "";
+            ModName = "";
+            ModHelp = false;
+            ModHud = false;
+            ModWorldData = false;
+            ModSetting = false;
+            ItemScriptPath = "";
         }
 
         private static string SettingsPath
@@ -95,6 +107,12 @@ namespace NpcSkinMaker
                         if (!string.IsNullOrEmpty(user.McPath)) settings.McPath = user.McPath;
                         if (!string.IsNullOrEmpty(user.ModScriptPath)) settings.ModScriptPath = user.ModScriptPath;
                         if (!string.IsNullOrEmpty(user.ModOutDir)) settings.ModOutDir = user.ModOutDir;
+                        if (!string.IsNullOrEmpty(user.ModName)) settings.ModName = user.ModName;
+                        settings.ModHelp = user.ModHelp;
+                        settings.ModHud = user.ModHud;
+                        settings.ModWorldData = user.ModWorldData;
+                        settings.ModSetting = user.ModSetting;
+                        if (!string.IsNullOrEmpty(user.ItemScriptPath)) settings.ItemScriptPath = user.ItemScriptPath;
                     }
                 }
             }
@@ -121,6 +139,12 @@ namespace NpcSkinMaker
                     McPath = this.McPath,
                     ModScriptPath = this.ModScriptPath,
                     ModOutDir = this.ModOutDir,
+                    ModName = this.ModName,
+                    ModHelp = this.ModHelp,
+                    ModHud = this.ModHud,
+                    ModWorldData = this.ModWorldData,
+                    ModSetting = this.ModSetting,
+                    ItemScriptPath = this.ItemScriptPath,
                 };
                 string json = JsonConvert.SerializeObject(save, Formatting.Indented);
                 File.WriteAllText(SettingsPath, json);
